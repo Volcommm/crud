@@ -1,0 +1,24 @@
+services:
+  php:
+    image: php:7.4-apache
+    container_name: php-app
+    volumes:
+      - ./php:/var/www/html  # Monta la tua app PHP nel container
+    ports:
+      - "8080:80"  # Espone la porta 80 del container sulla porta 8080 della macchina host
+    depends_on:
+      - db
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    command: /bin/bash -c "docker-php-ext-install mysqli && apache2-foreground"  # Installa l'estensione mysqli e avvia Apache
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: crud_with_login
+      MYSQL_USER: crud
+      MYSQL_PASSWORD: crud
+    volumes:
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql
+    ports:
+      - "3336:3306"
