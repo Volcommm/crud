@@ -1,32 +1,61 @@
 <?php session_start(); ?>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<title>Homepage</title>
-	<link href="style.css" rel="stylesheet" type="text/css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        #header, #footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .container {
+            margin-top: 50px;
+        }
+    </style>
 </head>
 
 <body>
-	<div id="header">
-		Benvenuto in Commessa 2.0 
-	</div>
-	<?php
-	if(isset($_SESSION['valid'])) {			
-		include("connection.php");					
-		$result = mysqli_query($mysqli, "SELECT * FROM login");
-	?>
-				
-		Welcome <?php echo $_SESSION['name'] ?> ! <a href='logout.php'>Logout</a><br/>
-		<br/>
-		<a href='view.php'>View and Add Products</a>
-		<br/><br/>
-	<?php	
-	} else {
-		echo "You must be logged in to view this page.<br/><br/>";
-		echo "<a href='login.php'>Login</a> | <a href='register.php'>Register</a>";
-	}
-	?>
-	<div id="footer">
-		Created by Lutech Team
-	</div>
+    <div id="header">
+        <h1>Benvenuto in Commessa 2.0</h1>
+    </div>
+    
+    <div class="container">
+        <?php
+        if (isset($_SESSION['valid'])) {			
+            include("connection.php");					
+            $result = mysqli_query($mysqli, "SELECT * FROM login");
+        ?>
+            <div class="alert alert-success" role="alert">
+                Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?>! 
+                <a href='logout.php' class="btn btn-danger btn-sm">Logout</a>
+            </div>
+            <div class="text-center">
+                <a href='view.php' class="btn btn-primary">View and Add Products</a>
+            </div>
+        <?php	
+        } else {
+            echo "<div class='alert alert-warning' role='alert'>You must be logged in to view this page.</div>";
+            echo "<div class='text-center'>
+                    <a href='login.php' class='btn btn-primary'>Login</a> | 
+                    <a href='register.php' class='btn btn-secondary'>Register</a>
+                  </div>";
+        }
+        ?>
+    </div>
+
+    <div id="footer">
+        <p>Created by Lutech Team</p>
+    </div>
+
+    <!-- Bootstrap 5 JS for functionality (if needed) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,13 +1,13 @@
 <?php
 session_start();
-ob_start(); // Avvia il buffer di output
+ob_start(); // Start output buffering
 
 if (!isset($_SESSION['valid'])) {
     header('Location: login.php');
-    exit(); // Assicurati di uscire dopo il reindirizzamento
+    exit(); // Make sure to exit after redirection
 }
 
-// including the database connection file
+// Including the database connection file
 include_once("connection.php");
 
 // Fetch unique product names for filter
@@ -25,11 +25,17 @@ $priceResult = mysqli_query($mysqli, $priceQuery);
 // Construct the query with filters
 $query = "SELECT * FROM products WHERE login_id=" . $_SESSION['id'];
 
+// Add search filter if provided
+if (!empty($_GET['search'])) {
+    $searchTerm = mysqli_real_escape_string($mysqli, $_GET['search']); // Escape the search term
+    $query .= " AND (name LIKE '%$searchTerm%' OR qty LIKE '%$searchTerm%' OR price LIKE '%$searchTerm%')";
+}
+
 if (!empty($_GET['name'])) {
     $names = $_GET['name'];
     $nameFilter = implode("','", array_map(function($name) use ($mysqli) {
-        return mysqli_real_escape_string($mysqli, $name); // Passa anche la connessione
-    }, $names)); // Escape each name
+        return mysqli_real_escape_string($mysqli, $name); // Escape each name
+    }, $names));
     $query .= " AND name IN ('$nameFilter')";
 }
 
@@ -42,81 +48,65 @@ if (!empty($_GET['qty'])) {
 if (!empty($_GET['price'])) {
     $prices = $_GET['price'];
     $priceFilter = implode("','", array_map(function($price) use ($mysqli) {
-        return mysqli_real_escape_string($mysqli, $price); // Passa anche la connessione
-    }, $prices)); // Escape each price
+        return mysqli_real_escape_string($mysqli, $price); // Escape each price
+    }, $prices));
     $query .= " AND price IN ('$priceFilter')";
 }
 
 $query .= " ORDER BY id DESC";
 $result = mysqli_query($mysqli, $query);
 
-// handling form submission (from modal)
+// Handle form submission for adding new product
 if (isset($_POST['add'])) {
     $name = $_POST['name'];
     $qty = $_POST['qty'];
     $price = $_POST['price'];
     $loginId = $_SESSION['id'];
-
-    // checking empty fields
+    
+    // Check for empty fields
     if (empty($name) || empty($qty) || empty($price)) {
-        // handle errors with empty fields
-        $errorMessages = "";
-        if (empty($name)) $errorMessages .= "<font color='red'>Name field is empty.</font><br/>";
-        if (empty($qty)) $errorMessages .= "<font color='red'>Quantity field is empty.</font><br/>";
-        if (empty($price)) $errorMessages .= "<font color='red'>Price field is empty.</font><br/>";
-
-        echo $errorMessages; // Show error messages
+        $errorMessages = "All fields are required.";
     } else {
         // Validate price format
         if (!preg_match("/^\d+(\.\d{1,2})?$/", $price)) {
-            $errorMessages .= "<font color='red'>Il prezzo deve essere un numero valido con al massimo due decimali.</font><br/>";
-            echo $errorMessages; // Show error messages
+            $errorMessages = "Price must be a valid number with up to two decimals.";
         } else {
-            // insert data into the database
+            // Insert data into the database
             $result = mysqli_query($mysqli, "INSERT INTO products(name, qty, price, login_id) VALUES('$name', '$qty', '$price', '$loginId')");
 
             if ($result) {
                 header("Location: view.php?msg=success");
-                exit(); // Assicurati di uscire dopo il reindirizzamento
+                exit();
             } else {
-                header("Location: view.php?msg=error&error=" . urlencode(mysqli_error($mysqli)));
-                exit(); // Assicurati di uscire dopo il reindirizzamento
+                $errorMessages = mysqli_error($mysqli);
             }
         }
     }
 }
 
-// Gestione della sottomissione del modulo per l'aggiornamento
+// Handle form submission for updating product
 if (isset($_POST['update'])) {
     $id = $_POST['id'];
     $name = $_POST['name'];
     $qty = $_POST['qty'];
     $price = $_POST['price'];
 
-    // Controllo dei campi vuoti
+    // Check for empty fields
     if (empty($name) || empty($qty) || empty($price)) {
-        // Gestione degli errori per campi vuoti
-        $errorMessages = "";
-        if (empty($name)) $errorMessages .= "<font color='red'>Il campo Nome è vuoto.</font><br/>";
-        if (empty($qty)) $errorMessages .= "<font color='red'>Il campo Quantità è vuoto.</font><br/>";
-        if (empty($price)) $errorMessages .= "<font color='red'>Il campo Prezzo è vuoto.</font><br/>";
-
-        echo $errorMessages; // Mostra i messaggi di errore
+        $errorMessages = "All fields are required.";
     } else {
         // Validate price format
         if (!preg_match("/^\d+(\.\d{1,2})?$/", $price)) {
-            $errorMessages .= "<font color='red'>Il prezzo deve essere un numero valido con al massimo due decimali.</font><br/>";
-            echo $errorMessages; // Show error messages
+            $errorMessages = "Price must be a valid number with up to two decimals.";
         } else {
-            // Aggiornamento della tabella
+            // Update the database
             $result = mysqli_query($mysqli, "UPDATE products SET name='$name', qty='$qty', price='$price' WHERE id=$id");
 
             if ($result) {
                 header("Location: view.php?msg=update_success");
-                exit(); // Assicurati di uscire dopo il reindirizzamento
+                exit();
             } else {
-                header("Location: view.php?msg=error&error=" . urlencode(mysqli_error($mysqli)));
-                exit(); // Assicurati di uscire dopo il reindirizzamento
+                $errorMessages = mysqli_error($mysqli);
             }
         }
     }
@@ -128,60 +118,43 @@ if (isset($_POST['update'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+    <title>Product Management</title>
+    <!-- Adding Bootstrap 5 CSS for modern style -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Adding Bootstrap CSS for modern style -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS for additional styling -->
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #e9ecef;
         }
 
         .container {
             margin-top: 50px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .table th, .table td {
+            vertical-align: middle;
         }
 
-        table th, table td {
-            padding: 12px;
-            text-align: center;
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
         }
 
-        table th {
+        .btn-edit, .btn-delete {
+            margin: 5px;
+        }
+
+        .modal-header {
             background-color: #343a40;
             color: white;
         }
 
-        table tr:nth-child(even) {
-            background-color: #f2f2f2;
+        .modal-footer .btn {
+            flex: 1;
         }
 
-        .btn-edit {
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-        }
-
-        .btn-delete {
-            color: #fff;
-            background-color: #dc3545;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-        }
-
-        .btn-edit:hover, .btn-delete:hover {
-            opacity: 0.8;
+        .error-message {
+            color: red;
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -190,17 +163,24 @@ if (isset($_POST['update'])) {
     <div class="container">
         <div class="d-flex justify-content-between mb-3">
             <a href="index.php" class="btn btn-primary">Home</a>
-            <!-- Trigger the modal -->
-            <button class="btn btn-success" data-toggle="modal" data-target="#addModal">Add New Data</button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Add New Data</button>
             <a href="logout.php" class="btn btn-danger">Logout</a>
         </div>
 
+        <!-- Form for searching products -->
+        <form action="view.php" method="GET" class="mb-3 text-center">
+            <div class="mb-3">
+                <input type="text" name="search" class="form-control w-50 mx-auto" id="search" placeholder="Enter search term">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
         <!-- Form for filtering products -->
-        <div class="mb-3">
-            <form action="view.php" method="GET" class="form-inline">
-                <div class="form-group mr-2">
-                    <label for="name">Filter by Name</label>
-                    <select name="name[]" class="form-control" multiple id="nameSelect">
+        <form action="view.php" method="GET" class="mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="name" class="form-label">Filter by Name</label>
+                    <select name="name[]" class="form-select" multiple id="nameSelect">
                         <option value="">Select All</option>
                         <?php while ($nameRow = mysqli_fetch_assoc($nameResult)) { ?>
                             <option value="<?php echo htmlspecialchars($nameRow['name']); ?>">
@@ -209,9 +189,9 @@ if (isset($_POST['update'])) {
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-group mr-2">
-                    <label for="qty">Filter by Quantity</label>
-                    <select name="qty[]" class="form-control" multiple id="qtySelect">
+                <div class="col-md-4">
+                    <label for="qty" class="form-label">Filter by Quantity</label>
+                    <select name="qty[]" class="form-select" multiple id="qtySelect">
                         <option value="">Select All</option>
                         <?php while ($qtyRow = mysqli_fetch_assoc($qtyResult)) { ?>
                             <option value="<?php echo htmlspecialchars($qtyRow['qty']); ?>">
@@ -220,9 +200,9 @@ if (isset($_POST['update'])) {
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-group mr-2">
-                    <label for="price">Filter by Price</label>
-                    <select name="price[]" class="form-control" multiple id="priceSelect">
+                <div class="col-md-4">
+                    <label for="price" class="form-label">Filter by Price</label>
+                    <select name="price[]" class="form-select" multiple id="priceSelect">
                         <option value="">Select All</option>
                         <?php while ($priceRow = mysqli_fetch_assoc($priceResult)) { ?>
                             <option value="<?php echo htmlspecialchars($priceRow['price']); ?>">
@@ -231,11 +211,38 @@ if (isset($_POST['update'])) {
                         <?php } ?>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Filter</button>
-            </form>
-        </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Apply Filters</button>
+        </form>
+        
+        <script>
+            // Aggiungi un evento di change a tutti i select
+            document.querySelectorAll('select[multiple]').forEach(select => {
+                select.addEventListener('change', function() {
+                    const options = select.options;
+                    const isSelectAll = options[0].selected;
+        
+                    if (isSelectAll) {
+                        // Se "Select All" è selezionato, seleziona tutte le altre opzioni
+                        for (let i = 1; i < options.length; i++) {
+                            options[i].selected = true;
+                        }
+                    } else {
+                        // Se tutte le opzioni sono selezionate, seleziona anche "Select All"
+                        const allSelected = Array.from(options).slice(1).every(option => option.selected);
+                        options[0].selected = allSelected;
+                    }
+                });
+            });
+        </script>
 
-        <table class="table table-bordered">
+        <!-- Display error messages -->
+        <?php if (isset($errorMessages)): ?>
+            <div class="error-message"><?php echo $errorMessages; ?></div>
+        <?php endif; ?>
+
+        <!-- Table to display products -->
+        <table class="table table-hover table-bordered">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -246,144 +253,82 @@ if (isset($_POST['update'])) {
                 </tr>
             </thead>
             <tbody>
-                <?php
-                if (mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                ?>
+                <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                     <tr>
                         <td><?php echo $row['id']; ?></td>
                         <td><?php echo htmlspecialchars($row['name']); ?></td>
                         <td><?php echo htmlspecialchars($row['qty']); ?></td>
                         <td><?php echo htmlspecialchars($row['price']); ?></td>
                         <td>
-                            <button class="btn-edit" data-toggle="modal" data-target="#editModal" data-id="<?php echo $row['id']; ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>" data-qty="<?php echo htmlspecialchars($row['qty']); ?>" data-price="<?php echo htmlspecialchars($row['price']); ?>">Edit</button>
-                            <a href="delete.php?id=<?php echo $row['id']; ?>" class="btn-delete">Delete</a>
+                            <button class="btn btn-edit btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $row['id']; ?>">Edit</button>
+                            <a href="delete.php?id=<?php echo $row['id']; ?>" class="btn btn-delete btn-danger" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
                         </td>
                     </tr>
-                <?php
-                    }
-                } else {
-                    echo "<tr><td colspan='5'>No data found</td></tr>";
-                }
-                ?>
+
+                    <!-- Edit Modal -->
+                    <div class="modal fade" id="editModal<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editModalLabel">Edit Product</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="view.php" method="POST">
+                                        <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                                        <div class="mb-3">
+                                            <label for="name" class="form-label">Name</label>
+                                            <input type="text" name="name" class="form-control" id="name" value="<?php echo htmlspecialchars($row['name']); ?>" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="qty" class="form-label">Quantity</label>
+                                            <input type="number" name="qty" class="form-control" id="qty" value="<?php echo htmlspecialchars($row['qty']); ?>" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="price" class="form-label">Price</label>
+                                            <input type="text" name="price" class="form-control" id="price" value="<?php echo htmlspecialchars($row['price']); ?>" required>
+                                        </div>
+                                        <button type="submit" name="update" class="btn btn-primary">Update</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php } ?>
             </tbody>
         </table>
-
-        <!-- Add Modal -->
-        <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addModalLabel">Add New Product</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form action="view.php" method="post">
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label for="name">Name</label>
-                                <input type="text" class="form-control" name="name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="qty">Quantity</label>
-                                <input type="number" class="form-control" name="qty" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="price">Price</label>
-                                <input type="text" class="form-control" name="price" required>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" name="add" class="btn btn-primary">Add Product</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Edit Modal -->
-        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Edit Product</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form action="view.php" method="post">
-                        <div class="modal-body">
-                            <input type="hidden" name="id" id="editProductId">
-                            <div class="form-group">
-                                <label for="name">Name</label>
-                                <input type="text" class="form-control" name="name" id="editProductName" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="qty">Quantity</label>
-                                <input type="number" class="form-control" name="qty" id="editProductQty" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="price">Price</label>
-                                <input type="text" class="form-control" name="price" id="editProductPrice" required>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" name="update" class="btn btn-primary">Update Product</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- jQuery, Bootstrap JS for modal -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Modal for Adding New Product -->
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Add New Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="view.php" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" name="name" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="qty" class="form-label">Quantity</label>
+                            <input type="number" name="qty" class="form-control" id="qty" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price</label>
+                            <input type="text" name="price" class="form-control" id="price" required>
+                        </div>
+                        <button type="submit" name="add" class="btn btn-primary">Add</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        $(document).ready(function () {
-            // When the edit button is clicked
-            $('#editModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var id = button.data('id');
-                var name = button.data('name');
-                var qty = button.data('qty');
-                var price = button.data('price');
-
-                var modal = $(this);
-                modal.find('#editProductId').val(id);
-                modal.find('#editProductName').val(name);
-                modal.find('#editProductQty').val(qty);
-                modal.find('#editProductPrice').val(price);
-            });
-
-            // Select all logic
-            $('#nameSelect').change(function () {
-                if ($(this).find('option[value=""]').is(':selected')) {
-                    $(this).find('option').prop('selected', true);
-                    $(this).find('option[value=""]').prop('selected', false);
-                }
-            });
-
-            $('#qtySelect').change(function () {
-                if ($(this).find('option[value=""]').is(':selected')) {
-                    $(this).find('option').prop('selected', true);
-                    $(this).find('option[value=""]').prop('selected', false);
-                }
-            });
-
-            $('#priceSelect').change(function () {
-                if ($(this).find('option[value=""]').is(':selected')) {
-                    $(this).find('option').prop('selected', true);
-                    $(this).find('option[value=""]').prop('selected', false);
-                }
-            });
-        });
-    </script>
+    <!-- Bootstrap 5 JS for modal functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
