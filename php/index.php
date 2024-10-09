@@ -34,11 +34,11 @@
             $result = mysqli_query($mysqli, "SELECT * FROM login");
         ?>
             <div class="alert alert-success" role="alert">
-                Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?>! 
+                Benvenuto, <?php echo htmlspecialchars($_SESSION['name']); ?>! 
                 <a href='logout.php' class="btn btn-danger btn-sm">Logout</a>
             </div>
             <div class="text-center">
-                <a href='view.php' class="btn btn-primary">View and Add Products</a>
+                <a href='personale.php' class="btn btn-primary">Visualizza Personale</a>
             </div>
         <?php	
         } else {

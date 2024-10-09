@@ -22,3 +22,4 @@ services:
       - ./database.sql:/docker-entrypoint-initdb.d/database.sql
     ports:
       - "3336:3306"
+      
