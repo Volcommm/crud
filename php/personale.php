@@ -226,6 +226,16 @@ if (!$result) {
             <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fas fa-user-plus"></i> Aggiungi Personale</button>
             <a href="logout.php" class="btn btn-outline-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
+		<?php 
+		// Ottieni i parametri della query string (filtri e ricerca attuali)
+		$queryString = $_SERVER['QUERY_STRING'];
+		?>
+		<div class="mb-3 text-center">
+			<a href="javascript:void(0)" class="btn btn-success" onclick="exportToExcel('<?php echo $queryString; ?>')">Esporta in Excel</a>
+			<a href="javascript:void(0)" class="btn btn-danger" onclick="exportToPDF('<?php echo $queryString; ?>')">Esporta in PDF</a>
+		</div>
+
+
 
         <!-- Form for searching personale -->
         <form action="personale.php" method="GET" class="mb-3 text-center">
@@ -369,6 +379,10 @@ if (!$result) {
 
     <!-- Bootstrap 5 JS for modal functionality -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
 	<script>
     document.addEventListener('DOMContentLoaded', function () {
         // Seleziona tutto per il filtro Nome
@@ -396,5 +410,73 @@ if (!$result) {
         });
     });
 </script>
+<script>
+		function exportToExcel(queryString) {
+			// Ottieni la tabella attualmente visibile
+			var table = document.querySelector("table");
+		
+			// Ottieni tutte le righe della tabella
+			var rows = [];
+			var headers = [];
+			table.querySelectorAll("tr").forEach(function(row, index) {
+				var rowData = [];
+				row.querySelectorAll("td, th").forEach(function(cell, cellIndex) {
+					// Escludi la colonna "Azione" (ultima colonna)
+					if (cellIndex < row.cells.length - 1) {
+						rowData.push(cell.innerText);
+					}
+				});
+				rows.push(rowData);
+			});
+		
+			// Crea un nuovo foglio di lavoro
+			var workbook = XLSX.utils.book_new();
+			var worksheet = XLSX.utils.aoa_to_sheet(rows);
+		
+			// Aggiungi il foglio di lavoro al file
+			XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet 1");
+		
+			// Aggiungi i filtri alla query string per il nome del file
+			var filename = "personale_filtrato_" + queryString.replace(/[^a-zA-Z0-9]/g, '_') + ".xlsx";
+		
+			// Esporta in formato Excel
+			XLSX.writeFile(workbook, filename);
+		}
+
+
+	function exportToPDF(queryString) {
+		var { jsPDF } = window.jspdf;
+		var doc = new jsPDF();
+	
+		// Seleziona solo la tabella visibile (dopo i filtri o la ricerca)
+		var table = document.querySelector("table");
+	
+		// Usa jsPDF AutoTable per generare la tabella nel PDF escludendo l'ultima colonna
+		doc.autoTable({
+			html: table,
+			theme: 'striped',
+			headStyles: { fillColor: [22, 160, 133] },
+			columnStyles: {
+				3: { cellWidth: 0 },  // Escludi la quarta colonna (indice 3), ovvero "Azione"
+			},
+			didParseCell: function(data) {
+				// Evita la colonna "Azione" (indice 3, ultima colonna)
+				if (data.column.index === 3) {
+					data.cell.text = '';  // Rimuovi il testo della cella
+				}
+			}
+		});
+	
+		// Aggiungi i filtri alla query string per il nome del file
+		var filename = "personale_filtrato_" + queryString.replace(/[^a-zA-Z0-9]/g, '_') + ".pdf";
+	
+		// Salva il PDF con il nome che include i filtri
+		doc.save(filename);
+	}
+
+
+
+</script>
+
 </body>
 </html>
