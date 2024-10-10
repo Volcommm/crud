@@ -124,97 +124,144 @@ if (!$result) {
 
     <style>
 
-        body {
-            background-color: #1d1f27;
-            color: #f8f9fa;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        .table {
-            background-color: #2b2e38;
-        }
-        .table th, .table td {
-            vertical-align: middle;
-            color: #f8f9fa;
-        }
+		/* Sfondo chiaro */
+		body {
+			background-color: #f8f9fa; /* Sfondo chiaro */
+			color: #212529; /* Testo scuro */
+		}
+		
+		/* Contenitore generale con dimensioni compatte */
+		.container {
+			margin-top: 40px;
+			padding: 15px;
+			background-color: #ffffff;
+			border-radius: 6px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+		}
+		
+		/* Tabelle con dimensioni compatte */
+		.table {
+			background-color: #ffffff;
+			border: 1px solid #dee2e6;
+			border-radius: 4px;
+		}
+		
+		.table th, .table td {
+			vertical-align: middle;
+			color: #212529;
+			padding: 10px; /* Ridotto il padding */
+			font-size: 14px; /* Font ridotto */
+		}
+		
 		.table-hover tbody tr:hover td {
-		background-color: #3e424d; /* Sfondo scuro */
-		color: #f8f9fa !important; /* Mantieni il testo bianco */
-		}
-
-
-        .btn-primary, .btn-success, .btn-danger, .btn-warning {
-            margin: 5px;
-        }
-        .modal-content {
-            background-color: #2b2e38;
-            color: #f8f9fa;
-            border: 1px solid #343a40;
-        }
-        .modal-header {
-            background-color: #343a40;
-            color: white;
-        }
-        .modal-body {
-            background-color: #2b2e38;
-            color: #f8f9fa;
-        }
-        .modal-footer {
-            background-color: #343a40;
-        }
-        .form-control, .form-select {
-            background-color: #343a40;
-            color: #f8f9fa;
-            border: 1px solid #495057;
-        }
-        .form-control::placeholder {
-            color: #adb5bd;
-        }
-        .btn-edit {
-            background-color: #ffc107;
-            color: white;
-        }
-        .btn-delete {
-            background-color: #dc3545;
-            color: white;
-        }
-		/* Effetto hover sui pulsanti Modifica e Cancella */
-		.btn-edit:hover {
-			background-color: #e0a800; /* Colore leggermente più chiaro per l'hover */
-			color: #fff; /* Testo bianco */
+			background-color: #f1f3f5; /* Sfondo chiaro all'hover */
 		}
 		
-		.btn-delete:hover {
-			background-color: #c82333; /* Colore leggermente più chiaro per l'hover */
-			color: #fff; /* Testo bianco */
-		}
-		.input-group .form-control {
-			height: 48px; /* Altezza coerente per input */
-			margin: 0; /* Elimina i margini superiori e inferiori */
-			border-right: 0; /* Rimuovi il bordo destro per un'unione fluida con il pulsante */
-			box-sizing: border-box;
-			display: flex;
-			align-items: center;
+		/* Stile pulsanti più compatti */
+		.btn {
+			border-radius: 20px;
+			padding: 8px 16px; /* Ridotto il padding */
+			font-size: 13px; /* Ridotto il font */
+			font-weight: 500; /* Font meno pesante */
+			text-transform: uppercase;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Ombra più leggera */
 		}
 		
-		.input-group .btn {
-			height: 48px; /* Altezza coerente per il pulsante */
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 0 20px;
-			margin: 0; /* Elimina i margini verticali */
+		.btn-primary {
+			background-color: #007bff;
+			border-color: #007bff;
+			color: #fff;
+		}
+		
+		.btn-primary:hover {
+			background-color: #0056b3;
+			border-color: #004085;
+		}
+		
+		.btn-outline-light {
+			border-color: #007bff;
+			color: #007bff;
+		}
+		
+		.btn-outline-light:hover {
+			background-color: #007bff;
+			color: #fff;
+		}
+		
+		/* Modale compatto */
+		.modal-content {
+			background-color: #ffffff;
+			border-radius: 6px;
+		}
+		
+		.modal-header, .modal-footer {
+			background-color: #f1f3f5;
+		}
+		
+		.modal-body {
+			padding: 15px; /* Ridotto il padding */
+		}
+		
+		.modal-title {
+			font-size: 16px; /* Font più piccolo */
+		}
+		
+		/* Campi form più compatti */
+		.form-control, .form-select {
+			background-color: #ffffff;
+			color: #212529;
+			border: 1px solid #ced4da;
+			padding: 8px; /* Ridotto il padding */
+			font-size: 13px; /* Font più piccolo */
+			border-radius: 4px;
+		}
+		
+		.form-control::placeholder {
+			color: #6c757d;
+		}
+
+		/* Allarga solo i filtri per Nome e Tipologia */
+		#nomeSelect, #tipologiaSelect {
+			width: 100%;
+		}
+		
+		/* Mantieni la larghezza originale della barra di ricerca */
+		.input-group.w-50 {
+			width: 50% !important; /* Mantiene la dimensione della barra di ricerca */
+		}
+		
+		/* Distribuisce uniformemente le colonne dei filtri */
+		.row > .col-md-4 {
+			flex: 1;
+		}
+		/* Assicura che i filtri siano ben allineati e centrati */
+		.form-label {
+			display: block;
+			text-align: center;
+		}
+		/* Centra solo il pulsante Applica Filtri */
+		#filterForm .btn-primary {
+			display: block;
+			margin: 0 auto; /* Centra il pulsante */
+			width: 25%; /* Puoi modificare la larghezza a piacimento */
+		}
+
+		/* Stile compatto per la barra di navigazione */
+		.d-flex .btn {
+			margin-right: 8px;
+			padding: 8px 16px;
+			font-size: 13px;
+			border-radius: 20px;
 		}
 		/* Definisci una larghezza fissa per la colonna Azione */
 		.action-column {
 			width: 150px; /* Imposta una larghezza fissa */
 			text-align: right; /* Allinea il contenuto a destra */
 		}
-		
 		.action-column .btn {
 			margin-right: 5px;
 		}
+
 
     </style>
 </head>
