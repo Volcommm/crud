@@ -13,24 +13,29 @@ include("connection.php");
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #1d1f27; /* Sfondo scuro */
-            color: #f8f9fa; /* Colore del testo chiaro */
+            background-color: #f4f6f9; /* Sfondo chiaro coerente */
+            color: #333; /* Colore del testo */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .container {
             margin-top: 100px;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         #header {
             text-align: center;
             margin-bottom: 30px;
         }
         .alert {
-            background-color: #2b2e38; /* Colore dello sfondo dell'alert */
-            color: #f8f9fa; /* Colore del testo dell'alert */
+            background-color: #f8d7da; /* Colore dello sfondo dell'alert per gli errori */
+            color: #721c24; /* Colore del testo dell'alert */
         }
         .form-control {
-            background-color: #343a40; /* Sfondo input scuro */
-            color: #f8f9fa; /* Colore del testo input */
-            border: 1px solid #495057; /* Bordo dell'input */
+            background-color: #f8f9fa; /* Sfondo input chiaro */
+            color: #495057; /* Colore del testo input */
+            border: 1px solid #ced4da; /* Bordo dell'input */
         }
         .form-control::placeholder {
             color: #adb5bd; /* Colore del placeholder */
@@ -42,6 +47,16 @@ include("connection.php");
         .btn-primary:hover {
             opacity: 0.9; /* Leggero effetto hover */
         }
+        .btn-link {
+            font-size: 14px;
+            color: #007bff;
+        }
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+        .text-center {
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -49,7 +64,6 @@ include("connection.php");
     <div class="container">
         <div id="header">
             <h1>Accesso a Commessa</h1>
-            <a href="index.php" class="btn btn-link text-light">Home</a>
         </div>
 
         <?php
@@ -91,8 +105,13 @@ include("connection.php");
                     <label for="password" class="form-label">Password</label>
                     <input type="password" name="password" class="form-control" id="password" required placeholder="Inserisci password">
                 </div>
-                <button type="submit" name="submit" class="btn btn-primary">Invia</button>
+                <div class="text-center">
+                    <button type="submit" name="submit" class="btn btn-primary">Invia</button>
+                </div>
             </form>
+            <div class="text-center mt-3">
+                <a href="register.php" class="btn btn-link">Non hai un account? Registrati</a>
+            </div>
         <?php
         }
         ?>
