@@ -542,35 +542,45 @@ if (!$result) {
 		}
 
 
-	function exportToPDF(queryString) {
-		var { jsPDF } = window.jspdf;
-		var doc = new jsPDF();
-	
-		// Seleziona solo la tabella visibile (dopo i filtri o la ricerca)
-		var table = document.querySelector("table");
-	
-		// Usa jsPDF AutoTable per generare la tabella nel PDF escludendo l'ultima colonna
-		doc.autoTable({
-			html: table,
-			theme: 'striped',
-			headStyles: { fillColor: [22, 160, 133] },
-			columnStyles: {
-				3: { cellWidth: 0 },  // Escludi la quarta colonna (indice 3), ovvero "Azione"
-			},
-			didParseCell: function(data) {
-				// Evita la colonna "Azione" (indice 3, ultima colonna)
-				if (data.column.index === 3) {
-					data.cell.text = '';  // Rimuovi il testo della cella
-				}
-			}
-		});
-	
-		// Aggiungi i filtri alla query string per il nome del file
-		var filename = "personale_filtrato_" + queryString.replace(/[^a-zA-Z0-9]/g, '_') + ".pdf";
-	
-		// Salva il PDF con il nome che include i filtri
-		doc.save(filename);
-	}
+		function exportToPDF(queryString) {
+			var { jsPDF } = window.jspdf;
+			var doc = new jsPDF();
+		
+			// Seleziona solo la tabella visibile (dopo i filtri o la ricerca)
+			var table = document.querySelector("table");
+		
+			// Usa jsPDF AutoTable per generare la tabella nel PDF escludendo l'ultima colonna
+			doc.autoTable({
+				html: table,
+				theme: 'striped',
+				headStyles: { fillColor: [22, 160, 133] },
+				didParseCell: function(data) {
+					// Evita la colonna "Azione" (indice 2, terza colonna)
+					if (data.column.index === 2) {
+						data.cell.text = '';  // Rimuovi il testo della cella
+					}
+				},
+				// Specifica le colonne da includere (0: Nome, 1: Tipologia)
+				columns: [
+					{ header: 'Nome', dataKey: 'nome' },
+					{ header: 'Tipologia', dataKey: 'tipologia' }
+				],
+				// Imposta i dati da includere nel PDF
+				body: Array.from(table.querySelectorAll('tbody tr')).map(row => {
+					return {
+						nome: row.cells[0].innerText, // Nome
+						tipologia: row.cells[1].innerText // Tipologia
+					};
+				})
+			});
+		
+			// Aggiungi i filtri alla query string per il nome del file
+			var filename = "personale_filtrato_" + queryString.replace(/[^a-zA-Z0-9]/g, '_') + ".pdf";
+		
+			// Salva il PDF con il nome che include i filtri
+			doc.save(filename);
+		}
+		
 
 
 
