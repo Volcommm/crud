@@ -519,7 +519,7 @@ if (!$result) {
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Funzione per nascondere i parametri dalla barra degli indirizzi e inviare i form via AJAX
+        // Funzione per inviare i form via AJAX e nascondere i parametri dalla barra degli indirizzi
         function handleFormSubmit(event, form) {
             event.preventDefault(); // Prevenire il comportamento predefinito di submit
 
@@ -539,13 +539,34 @@ if (!$result) {
                     // Usa window.history.pushState per modificare l'URL senza ricaricare la pagina
                     const newUrl = window.location.pathname;
                     window.history.pushState({}, '', newUrl);
+
+                    // Resetta i filtri
+                    resetFilters();
                 });
+        }
+
+        // Funzione per resettare i filtri
+        function resetFilters() {
+            const filterForm = document.getElementById('filterForm');
+            if (filterForm) {
+                // Resetta i filtri selezionati
+                filterForm.reset();
+
+                // Deseleziona manualmente tutte le opzioni multiple
+                const selectElements = filterForm.querySelectorAll('select[multiple]');
+                selectElements.forEach(select => {
+                    Array.from(select.options).forEach(option => option.selected = false);
+                });
+            }
         }
 
         // Aggiungi event listener per il form di ricerca
         const searchForm = document.querySelector('form[action="personale.php"]');
         searchForm.addEventListener('submit', function (event) {
             handleFormSubmit(event, searchForm);
+
+            // Resetta i filtri quando viene eseguita una ricerca
+            resetFilters();
         });
 
         // Aggiungi event listener per il form dei filtri
@@ -553,10 +574,30 @@ if (!$result) {
         filterForm.addEventListener('submit', function (event) {
             handleFormSubmit(event, filterForm);
         });
+
+        // Funzione per gestire la selezione di "Seleziona tutto" per Nome e Tipologia
+        const nomeSelect = document.getElementById('nomeSelect');
+        const nomeSelectAllOption = nomeSelect.querySelector('[data-select-all]');
+        nomeSelect.addEventListener('change', function () {
+            if (nomeSelectAllOption.selected) {
+                for (let i = 0; i < nomeSelect.options.length; i++) {
+                    nomeSelect.options[i].selected = true;
+                }
+                nomeSelectAllOption.selected = false; // Deseleziona "Seleziona tutto" per il prossimo click
+            }
+        });
+
+        const tipologiaSelect = document.getElementById('tipologiaSelect');
+        const tipologiaSelectAllOption = tipologiaSelect.querySelector('[data-select-all]');
+        tipologiaSelect.addEventListener('change', function () {
+            if (tipologiaSelectAllOption.selected) {
+                for (let i = 0; i < tipologiaSelect.options.length; i++) {
+                    tipologiaSelect.options[i].selected = true;
+                }
+                tipologiaSelectAllOption.selected = false; // Deseleziona "Seleziona tutto" per il prossimo click
+            }
+        });
     });
 </script>
-
-
-
 </body>
 </html>
