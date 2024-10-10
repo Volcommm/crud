@@ -246,33 +246,34 @@ if (!$result) {
         </form>
 
         <!-- Form for filtering personale -->
-        <form action="personale.php" method="GET" class="mb-3">
-            <div class="row">
-                <div class="col-md-4">
-                    <label for="nome" class="form-label">Filtra per Nome</label>
-                    <select name="nome[]" class="form-select" multiple id="nomeSelect">
-                        <option value="" data-select-all>Seleziona tutto</option>
-                        <?php while ($nameRow = mysqli_fetch_assoc($nameResult)) { ?>
-                            <option value="<?php echo htmlspecialchars($nameRow['nome']); ?>">
-                                <?php echo htmlspecialchars($nameRow['nome']); ?>
-                            </option>
-                        <?php } ?>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="idtipologia" class="form-label">Filtra per Tipologia</label>
-                    <select name="idtipologia[]" class="form-select" multiple id="tipologiaSelect">
-                        <option value="" data-select-all>Seleziona tutto</option>
-                        <?php while ($tipologiaRow = mysqli_fetch_assoc($tipologiaResult)) { ?>
-                            <option value="<?php echo htmlspecialchars($tipologiaRow['idtipologia']); ?>">
-                                <?php echo htmlspecialchars($tipologiaRow['tipologia']); ?>
-                            </option>
-                        <?php } ?>
-                    </select>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Applica Filtri</button>
-        </form>
+		<form id="filterForm" action="personale.php" method="GET" class="mb-3">
+			<div class="row">
+				<div class="col-md-4">
+					<label for="nome" class="form-label">Filtra per Nome</label>
+					<select name="nome[]" class="form-select" multiple id="nomeSelect">
+						<option value="" data-select-all>Seleziona tutto</option>
+						<?php while ($nameRow = mysqli_fetch_assoc($nameResult)) { ?>
+							<option value="<?php echo htmlspecialchars($nameRow['nome']); ?>">
+								<?php echo htmlspecialchars($nameRow['nome']); ?>
+							</option>
+						<?php } ?>
+					</select>
+				</div>
+				<div class="col-md-4">
+					<label for="idtipologia" class="form-label">Filtra per Tipologia</label>
+					<select name="idtipologia[]" class="form-select" multiple id="tipologiaSelect">
+						<option value="" data-select-all>Seleziona tutto</option>
+						<?php while ($tipologiaRow = mysqli_fetch_assoc($tipologiaResult)) { ?>
+							<option value="<?php echo htmlspecialchars($tipologiaRow['idtipologia']); ?>">
+								<?php echo htmlspecialchars($tipologiaRow['tipologia']); ?>
+							</option>
+						<?php } ?>
+					</select>
+				</div>
+			</div>
+			<button type="submit" class="btn btn-primary mt-3">Applica Filtri</button>
+		</form>
+
 
         <!-- Display error messages -->
         <?php if (isset($errorMessages)): ?>
@@ -383,33 +384,72 @@ if (!$result) {
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
-	<script>
+<script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Seleziona tutto per il filtro Nome
+        // Funzione per nascondere i parametri dalla barra degli indirizzi e inviare i form via AJAX
+        function handleFormSubmit(event, form) {
+            event.preventDefault(); // Prevenire il comportamento predefinito di submit
+
+            // Ottieni i dati del form
+            const formData = new FormData(form);
+            const params = new URLSearchParams(formData);
+
+            // Aggiorna la tabella con i dati filtrati
+            fetch(form.action + '?' + params.toString())
+                .then(response => response.text())
+                .then(html => {
+                    // Aggiorna solo la tabella con i risultati filtrati
+                    document.querySelector('table tbody').innerHTML = new DOMParser()
+                        .parseFromString(html, 'text/html')
+                        .querySelector('table tbody').innerHTML;
+
+                    // Usa window.history.pushState per modificare l'URL senza ricaricare la pagina
+                    const newUrl = window.location.pathname;
+                    window.history.pushState({}, '', newUrl);
+
+                    // Resetta il form dei filtri dopo che i risultati sono stati mostrati
+                    form.reset();
+                });
+        }
+
+        // Aggiungi event listener per il form di ricerca
+        const searchForm = document.querySelector('form[action="personale.php"]');
+        searchForm.addEventListener('submit', function (event) {
+            handleFormSubmit(event, searchForm);
+        });
+
+        // Aggiungi event listener per il form dei filtri
+        const filterForm = document.getElementById('filterForm'); // Usa l'id per selezionare il form dei filtri
+        filterForm.addEventListener('submit', function (event) {
+            handleFormSubmit(event, filterForm);
+        });
+
+        // Funzione per gestire la selezione di "Seleziona tutto" per Nome e Tipologia
         const nomeSelect = document.getElementById('nomeSelect');
         const nomeSelectAllOption = nomeSelect.querySelector('[data-select-all]');
-
         nomeSelect.addEventListener('change', function () {
             if (nomeSelectAllOption.selected) {
                 for (let i = 0; i < nomeSelect.options.length; i++) {
                     nomeSelect.options[i].selected = true;
                 }
+                nomeSelectAllOption.selected = false; // Deseleziona "Seleziona tutto" per il prossimo click
             }
         });
 
-        // Seleziona tutto per il filtro Tipologia
         const tipologiaSelect = document.getElementById('tipologiaSelect');
         const tipologiaSelectAllOption = tipologiaSelect.querySelector('[data-select-all]');
-
         tipologiaSelect.addEventListener('change', function () {
             if (tipologiaSelectAllOption.selected) {
                 for (let i = 0; i < tipologiaSelect.options.length; i++) {
                     tipologiaSelect.options[i].selected = true;
                 }
+                tipologiaSelectAllOption.selected = false; // Deseleziona "Seleziona tutto" per il prossimo click
             }
         });
     });
 </script>
+
+
 <script>
 		function exportToExcel(queryString) {
 			// Ottieni la tabella attualmente visibile
@@ -477,6 +517,46 @@ if (!$result) {
 
 
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Funzione per nascondere i parametri dalla barra degli indirizzi e inviare i form via AJAX
+        function handleFormSubmit(event, form) {
+            event.preventDefault(); // Prevenire il comportamento predefinito di submit
+
+            // Ottieni i dati del form
+            const formData = new FormData(form);
+            const params = new URLSearchParams(formData);
+
+            // Aggiorna la tabella con i dati filtrati
+            fetch(form.action + '?' + params.toString())
+                .then(response => response.text())
+                .then(html => {
+                    // Aggiorna solo la tabella con i risultati filtrati
+                    document.querySelector('table tbody').innerHTML = new DOMParser()
+                        .parseFromString(html, 'text/html')
+                        .querySelector('table tbody').innerHTML;
+
+                    // Usa window.history.pushState per modificare l'URL senza ricaricare la pagina
+                    const newUrl = window.location.pathname;
+                    window.history.pushState({}, '', newUrl);
+                });
+        }
+
+        // Aggiungi event listener per il form di ricerca
+        const searchForm = document.querySelector('form[action="personale.php"]');
+        searchForm.addEventListener('submit', function (event) {
+            handleFormSubmit(event, searchForm);
+        });
+
+        // Aggiungi event listener per il form dei filtri
+        const filterForm = document.getElementById('filterForm'); // Usa l'id per selezionare il form dei filtri
+        filterForm.addEventListener('submit', function (event) {
+            handleFormSubmit(event, filterForm);
+        });
+    });
+</script>
+
+
 
 </body>
 </html>
