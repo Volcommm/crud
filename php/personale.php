@@ -156,6 +156,19 @@ if (!$result) {
 		.table-hover tbody tr:hover td {
 			background-color: #f1f3f5; /* Sfondo chiaro all'hover */
 		}
+		/* Stile per l'intestazione della tabella */
+		.table thead th {
+			background-color: #f08080; /* Colore di sfondo blu */
+			color: #ffffff; /* Colore del testo bianco */
+			text-align: left; /* Allinea il testo al centro */
+			font-weight: bold; /* Grassetto per il testo */
+		}
+		
+		/* Per aggiungere un effetto al passaggio del mouse sulle righe dell'intestazione */
+		.table thead th:hover {
+			background-color: #cd5c5c; /* Colore di sfondo più scuro al passaggio del mouse */
+		}
+
 		
 		/* Stile pulsanti più compatti */
 		.btn {
@@ -333,7 +346,6 @@ if (!$result) {
         <table class="table table-hover table-bordered">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Nome</th>
                     <th>Tipologia</th>
                     <th>Azione</th>
@@ -342,7 +354,6 @@ if (!$result) {
             <tbody>
                 <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                     <tr>
-                        <td><?php echo $row['idpersonale']; ?></td>
                         <td><?php echo htmlspecialchars($row['nome']); ?></td>
                         <td><?php echo htmlspecialchars($row['tipologia']); ?></td>
                         <td class="action-column">

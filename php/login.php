@@ -109,9 +109,6 @@ include("connection.php");
                     <button type="submit" name="submit" class="btn btn-primary">Invia</button>
                 </div>
             </form>
-            <div class="text-center mt-3">
-                <a href="register.php" class="btn btn-link">Non hai un account? Registrati</a>
-            </div>
         <?php
         }
         ?>
