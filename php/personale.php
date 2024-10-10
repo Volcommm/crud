@@ -123,31 +123,116 @@ if (!$result) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        body { background-color: #e9ecef; }
-        .container { margin-top: 50px; }
-        .table th, .table td { vertical-align: middle; }
-        .table-hover tbody tr:hover { background-color: #f1f1f1; }
-        .btn-edit, .btn-delete { margin: 5px; }
-        .modal-header { background-color: #343a40; color: white; }
-        .modal-footer .btn { flex: 1; }
-        .error-message { color: red; margin-top: 15px; }
+
+        body {
+            background-color: #1d1f27;
+            color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .table {
+            background-color: #2b2e38;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+            color: #f8f9fa;
+        }
+		.table-hover tbody tr:hover td {
+		background-color: #3e424d; /* Sfondo scuro */
+		color: #f8f9fa !important; /* Mantieni il testo bianco */
+		}
+
+
+        .btn-primary, .btn-success, .btn-danger, .btn-warning {
+            margin: 5px;
+        }
+        .modal-content {
+            background-color: #2b2e38;
+            color: #f8f9fa;
+            border: 1px solid #343a40;
+        }
+        .modal-header {
+            background-color: #343a40;
+            color: white;
+        }
+        .modal-body {
+            background-color: #2b2e38;
+            color: #f8f9fa;
+        }
+        .modal-footer {
+            background-color: #343a40;
+        }
+        .form-control, .form-select {
+            background-color: #343a40;
+            color: #f8f9fa;
+            border: 1px solid #495057;
+        }
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+        .btn-edit {
+            background-color: #ffc107;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+		/* Effetto hover sui pulsanti Modifica e Cancella */
+		.btn-edit:hover {
+			background-color: #e0a800; /* Colore leggermente più chiaro per l'hover */
+			color: #fff; /* Testo bianco */
+		}
+		
+		.btn-delete:hover {
+			background-color: #c82333; /* Colore leggermente più chiaro per l'hover */
+			color: #fff; /* Testo bianco */
+		}
+		.input-group .form-control {
+			height: 48px; /* Altezza coerente per input */
+			margin: 0; /* Elimina i margini superiori e inferiori */
+			border-right: 0; /* Rimuovi il bordo destro per un'unione fluida con il pulsante */
+			box-sizing: border-box;
+			display: flex;
+			align-items: center;
+		}
+		
+		.input-group .btn {
+			height: 48px; /* Altezza coerente per il pulsante */
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0 20px;
+			margin: 0; /* Elimina i margini verticali */
+		}
+		/* Definisci una larghezza fissa per la colonna Azione */
+		.action-column {
+			width: 150px; /* Imposta una larghezza fissa */
+			text-align: right; /* Allinea il contenuto a destra */
+		}
+		
+		.action-column .btn {
+			margin-right: 5px;
+		}
+
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="d-flex justify-content-between mb-3">
-            <a href="index.php" class="btn btn-primary">Home</a>
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Aggiungi Personale</button>
-            <a href="logout.php" class="btn btn-danger">Logout</a>
+            <a href="index.php" class="btn btn-outline-light"><i class="fas fa-home"></i> Home</a>
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fas fa-user-plus"></i> Aggiungi Personale</button>
+            <a href="logout.php" class="btn btn-outline-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
 
         <!-- Form for searching personale -->
         <form action="personale.php" method="GET" class="mb-3 text-center">
-            <div class="mb-3">
-                <input type="text" name="search" class="form-control w-50 mx-auto" id="search" placeholder="Inserisci termine da cercare">
+            <div class="input-group w-50 mx-auto">
+                <input type="text" name="search" class="form-control" id="search" placeholder="Inserisci termine da cercare">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Cerca</button>
             </div>
-            <button type="submit" class="btn btn-primary">Cerca</button>
         </form>
 
         <!-- Form for filtering personale -->
@@ -156,7 +241,7 @@ if (!$result) {
                 <div class="col-md-4">
                     <label for="nome" class="form-label">Filtra per Nome</label>
                     <select name="nome[]" class="form-select" multiple id="nomeSelect">
-                        <option value="">Seleziona tutto</option>
+                        <option value="" data-select-all>Seleziona tutto</option>
                         <?php while ($nameRow = mysqli_fetch_assoc($nameResult)) { ?>
                             <option value="<?php echo htmlspecialchars($nameRow['nome']); ?>">
                                 <?php echo htmlspecialchars($nameRow['nome']); ?>
@@ -167,7 +252,7 @@ if (!$result) {
                 <div class="col-md-4">
                     <label for="idtipologia" class="form-label">Filtra per Tipologia</label>
                     <select name="idtipologia[]" class="form-select" multiple id="tipologiaSelect">
-                        <option value="">Seleziona tutto</option>
+                        <option value="" data-select-all>Seleziona tutto</option>
                         <?php while ($tipologiaRow = mysqli_fetch_assoc($tipologiaResult)) { ?>
                             <option value="<?php echo htmlspecialchars($tipologiaRow['idtipologia']); ?>">
                                 <?php echo htmlspecialchars($tipologiaRow['tipologia']); ?>
@@ -181,7 +266,9 @@ if (!$result) {
 
         <!-- Display error messages -->
         <?php if (isset($errorMessages)): ?>
-            <div class="error-message"><?php echo $errorMessages; ?></div>
+            <div class="alert alert-danger text-center" role="alert">
+                <?php echo $errorMessages; ?>
+            </div>
         <?php endif; ?>
 
         <!-- Table to display personale -->
@@ -200,7 +287,8 @@ if (!$result) {
                         <td><?php echo $row['idpersonale']; ?></td>
                         <td><?php echo htmlspecialchars($row['nome']); ?></td>
                         <td><?php echo htmlspecialchars($row['tipologia']); ?></td>
-                        <td>
+                        <td class="action-column">
+							<div class="d-flex justify-content-end">
                             <button class="btn btn-edit btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $row['idpersonale']; ?>">Modifica</button>
                             <a href="personale.php?delete_id=<?php echo $row['idpersonale']; ?>" class="btn btn-delete btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questo personale?');">Cancella</a>
                         </td>
@@ -281,5 +369,32 @@ if (!$result) {
 
     <!-- Bootstrap 5 JS for modal functionality -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Seleziona tutto per il filtro Nome
+        const nomeSelect = document.getElementById('nomeSelect');
+        const nomeSelectAllOption = nomeSelect.querySelector('[data-select-all]');
+
+        nomeSelect.addEventListener('change', function () {
+            if (nomeSelectAllOption.selected) {
+                for (let i = 0; i < nomeSelect.options.length; i++) {
+                    nomeSelect.options[i].selected = true;
+                }
+            }
+        });
+
+        // Seleziona tutto per il filtro Tipologia
+        const tipologiaSelect = document.getElementById('tipologiaSelect');
+        const tipologiaSelectAllOption = tipologiaSelect.querySelector('[data-select-all]');
+
+        tipologiaSelect.addEventListener('change', function () {
+            if (tipologiaSelectAllOption.selected) {
+                for (let i = 0; i < tipologiaSelect.options.length; i++) {
+                    tipologiaSelect.options[i].selected = true;
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>

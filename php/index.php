@@ -8,16 +8,36 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #1d1f27; /* Sfondo scuro */
+            color: #f8f9fa; /* Colore del testo chiaro */
         }
         #header, #footer {
-            background-color: #343a40;
-            color: white;
+            background-color: #343a40; /* Colore di sfondo del header e footer */
+            color: white; /* Colore del testo */
             text-align: center;
             padding: 10px 0;
         }
         .container {
             margin-top: 50px;
+        }
+        .alert {
+            background-color: #2b2e38; /* Colore dello sfondo dell'alert */
+            color: #f8f9fa; /* Colore del testo dell'alert */
+        }
+        .btn-primary {
+            background-color: #007bff; /* Colore del bottone primario */
+            border-color: #007bff; /* Colore del bordo del bottone primario */
+        }
+        .btn-danger {
+            background-color: #dc3545; /* Colore del bottone per logout */
+            border-color: #dc3545; /* Colore del bordo del bottone per logout */
+        }
+        .btn-secondary {
+            background-color: #6c757d; /* Colore del bottone secondario per registrazione */
+            border-color: #6c757d; /* Colore del bordo del bottone secondario */
+        }
+        .btn-primary:hover, .btn-danger:hover, .btn-secondary:hover {
+            opacity: 0.9; /* Leggero effetto hover */
         }
     </style>
 </head>
@@ -42,10 +62,10 @@
             </div>
         <?php	
         } else {
-            echo "<div class='alert alert-warning' role='alert'>You must be logged in to view this page.</div>";
+            echo "<div class='alert alert-warning' role='alert'>Devi essere loggato per visualizzare questa pagina.</div>";
             echo "<div class='text-center'>
                     <a href='login.php' class='btn btn-primary'>Login</a> | 
-                    <a href='register.php' class='btn btn-secondary'>Register</a>
+                    <a href='register.php' class='btn btn-secondary'>Registrati</a>
                   </div>";
         }
         ?>

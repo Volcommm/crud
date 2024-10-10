@@ -13,7 +13,8 @@ include("connection.php");
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #1d1f27; /* Sfondo scuro */
+            color: #f8f9fa; /* Colore del testo chiaro */
         }
         .container {
             margin-top: 100px;
@@ -22,6 +23,25 @@ include("connection.php");
             text-align: center;
             margin-bottom: 30px;
         }
+        .alert {
+            background-color: #2b2e38; /* Colore dello sfondo dell'alert */
+            color: #f8f9fa; /* Colore del testo dell'alert */
+        }
+        .form-control {
+            background-color: #343a40; /* Sfondo input scuro */
+            color: #f8f9fa; /* Colore del testo input */
+            border: 1px solid #495057; /* Bordo dell'input */
+        }
+        .form-control::placeholder {
+            color: #adb5bd; /* Colore del placeholder */
+        }
+        .btn-primary {
+            background-color: #007bff; /* Colore del bottone primario */
+            border-color: #007bff; /* Colore del bordo del bottone primario */
+        }
+        .btn-primary:hover {
+            opacity: 0.9; /* Leggero effetto hover */
+        }
     </style>
 </head>
 
@@ -29,7 +49,7 @@ include("connection.php");
     <div class="container">
         <div id="header">
             <h1>Accesso a Commessa</h1>
-            <a href="index.php" class="btn btn-link">Home</a>
+            <a href="index.php" class="btn btn-link text-light">Home</a>
         </div>
 
         <?php
@@ -38,8 +58,8 @@ include("connection.php");
             $pass = mysqli_real_escape_string($mysqli, $_POST['password']);
 
             if ($user == "" || $pass == "") {
-                echo "<div class='alert alert-danger' role='alert'>Either username or password field is empty.</div>";
-                echo "<a href='login.php' class='btn btn-primary'>Go back</a>";
+                echo "<div class='alert alert-danger' role='alert'>Il campo username o password è vuoto.</div>";
+                echo "<a href='login.php' class='btn btn-primary'>Torna indietro</a>";
             } else {
                 $result = mysqli_query($mysqli, "SELECT * FROM login WHERE username='$user' AND password=md5('$pass')")
                             or die("Could not execute the select query.");
@@ -56,8 +76,8 @@ include("connection.php");
                     header('Location: index.php');
                     exit(); // Assicurati di terminare lo script dopo il redirect
                 } else {
-                    echo "<div class='alert alert-danger' role='alert'>Invalid username or password.</div>";
-                    echo "<a href='login.php' class='btn btn-primary'>Go back</a>";
+                    echo "<div class='alert alert-danger' role='alert'>Username o password non validi.</div>";
+                    echo "<a href='login.php' class='btn btn-primary'>Torna indietro</a>";
                 }
             }
         } else {
@@ -65,13 +85,13 @@ include("connection.php");
             <form name="form1" method="post" action="">
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" name="username" class="form-control" id="username" required>
+                    <input type="text" name="username" class="form-control" id="username" required placeholder="Inserisci username">
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" id="password" required>
+                    <input type="password" name="password" class="form-control" id="password" required placeholder="Inserisci password">
                 </div>
-                <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" name="submit" class="btn btn-primary">Invia</button>
             </form>
         <?php
         }
