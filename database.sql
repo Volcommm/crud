@@ -266,7 +266,7 @@ INSERT INTO `commesse` (`idcommessa`, `idcliente`, `numero`, `rifoff`, `stato`, 
 (327, 241, '479-24', '', 'aperta', '2024-06-18', 'Pannelli solari', 0, 0, 0, 0, '2027-06-30'),
 (328, 242, '480-24', '3246-3269', '', '2024-06-19', 'RIFACIMENTO IMPIANTO ELETTRICO', 12888, 0, 0, 0, '2027-06-09'),
 (329, 243, '481-24', '3268', 'aperta', '2024-07-10', 'Adeguamento parti comuni', 0, 0, 0, 0, '2029-08-30'),
-(330, 244, '482-24', '', 'aperta', '2024-09-10', 'rifacimento lici PT palazzo PIOLI', 68.9, 68.9, 0, 0, '2028-09-10');
+(330, 244, '482-24', '', 'aperta', '2024-09-10', 'rifacimento lici PT palazzo PIOLI', 68900, 68900, 0, 0, '2028-09-10');
 
 
 -- --------------------------------------------------------
