@@ -165,7 +165,7 @@ if (!$result) {
     <title>Gestione Commesse</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
 
 		/* Sfondo chiaro */
@@ -323,6 +323,10 @@ if (!$result) {
 		.action-column .btn {
 			margin-right: 5px;
 		}
+		.sort-icon {
+		    margin-left: 10px;
+		    cursor: pointer;
+		}
 
 
     </style>
@@ -391,22 +395,23 @@ if (!$result) {
         <!-- Table to display commesse -->
         <div class="table-responsive">
 			<table class="table table-hover table-bordered">
-            <thead>
-                <tr>
-                    <th>Numero Commessa</th>
-                    <th>Riferimento Offerta</th>
-                    <th>Stato</th>
-                    <th>Data Apertura</th>
-                    <th>Cliente</th>
-                    <th>Descrizione Lavoro</th>
-                    <th>Offerta in Uscita</th>
-                    <th>Costo Totale Previsto</th>
-                    <th>Costo Fornitori Previsto</th>
-                    <th>Costo Personale Previsto</th>
-                    <th>Data Chiusura</th>
-                    <th>Azione</th>
-                </tr>
-            </thead>
+            	<thead>
+		    <tr>
+			<th onclick="sortTable(0, this)">Numero Commessa <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(1, this)">Riferimento Offerta <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(2, this)">Stato <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(3, this)">Data Apertura <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(4, this)">Cliente <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(5, this)">Descrizione Lavoro <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(6, this)">Offerta in Uscita <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(7, this)">Costo Totale Previsto <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(8, this)">Costo Fornitori Previsto <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(9, this)">Costo Personale Previsto <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(10, this)">Data Chiusura <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th>Azione</th>
+		    </tr>
+		</thead>
+
             <tbody>
                 <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                     <tr>
@@ -579,6 +584,47 @@ if (!$result) {
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script>
+let sortDirection = {};
+
+function sortTable(columnIndex, thElement) {
+    let table = thElement.closest('table');
+    let rows = Array.from(table.querySelectorAll('tbody tr'));
+    let isAscending = sortDirection[columnIndex] !== 'asc'; // Se già ascendente, sarà discendente, altrimenti ascendente
+    
+    rows.sort((rowA, rowB) => {
+        let cellA = rowA.cells[columnIndex].innerText.trim();
+        let cellB = rowB.cells[columnIndex].innerText.trim();
+
+        // Gestione delle colonne in valuta (Offerta in Uscita, Costo Totale Previsto, ecc.)
+        if (columnIndex === 6 || columnIndex >= 7 && columnIndex <= 10) {
+            let numA = parseFloat(cellA.replace(/[^0-9.-]+/g,"")); // Rimuovi simboli non numerici
+            let numB = parseFloat(cellB.replace(/[^0-9.-]+/g,""));
+            return isAscending ? numA - numB : numB - numA;
+        }
+        // Gestione per testo (Cliente, Descrizione Lavoro, ecc.)
+        else {
+            return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+        }
+    });
+
+    // Aggiorna la tabella
+    let tbody = table.querySelector('tbody');
+    rows.forEach(row => tbody.appendChild(row));
+
+    // Aggiorna l'icona
+    table.querySelectorAll('th .sort-icon').forEach(icon => {
+        icon.innerHTML = '<i class="fas fa-sort"></i>'; // Resetta tutte le icone
+    });
+    thElement.querySelector('.sort-icon').innerHTML = isAscending ? '<i class="fas fa-sort-up"></i>' : '<i class="fas fa-sort-down"></i>';
+
+    // Memorizza la direzione attuale per questa colonna
+    sortDirection[columnIndex] = isAscending ? 'asc' : 'desc';
+}
+
+
+</script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

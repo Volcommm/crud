@@ -114,6 +114,7 @@ if (!$result) {
 ?>
 
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -121,7 +122,7 @@ if (!$result) {
     <title>Gestione Personale</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
 
 		/* Sfondo chiaro */
@@ -274,7 +275,10 @@ if (!$result) {
 		.action-column .btn {
 			margin-right: 5px;
 		}
-
+		.sort-icon {
+		    margin-left: 10px;
+		    cursor: pointer;
+		}
 
     </style>
 </head>
@@ -345,12 +349,13 @@ if (!$result) {
         <!-- Table to display personale -->
         <table class="table table-hover table-bordered">
             <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Tipologia</th>
-                    <th>Azione</th>
-                </tr>
-            </thead>
+		    <tr>
+			<th onclick="sortTable(0, this)">Nome <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(1, this)">Tipologia <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th>Azione</th>
+		    </tr>
+	    </thead>
+
             <tbody>
                 <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                     <tr>
@@ -506,6 +511,49 @@ if (!$result) {
         });
     });
 </script>
+        
+<script>
+	//  ordinamento
+    function sortTable(columnIndex, headerElement) {
+        var table = document.querySelector("table");
+        var rows = Array.from(table.querySelectorAll("tbody tr"));
+        var isAscending = headerElement.getAttribute("data-sort-order") === "asc";
+        var multiplier = isAscending ? 1 : -1;
+
+        // Rimuovi l'icona di ordinamento dalle altre colonne
+        var allHeaders = table.querySelectorAll("th span.sort-icon");
+        allHeaders.forEach(function(icon) {
+            icon.innerHTML = '<i class="fas fa-sort"></i>';
+        });
+
+        // Ordina le righe
+        rows.sort(function(rowA, rowB) {
+            var cellA = rowA.querySelectorAll("td")[columnIndex].innerText.toLowerCase();
+            var cellB = rowB.querySelectorAll("td")[columnIndex].innerText.toLowerCase();
+
+            if (cellA < cellB) return -1 * multiplier;
+            if (cellA > cellB) return 1 * multiplier;
+            return 0;
+        });
+
+        // Reappend sorted rows
+        var tbody = table.querySelector("tbody");
+        tbody.innerHTML = "";
+        rows.forEach(function(row) {
+            tbody.appendChild(row);
+        });
+
+        // Toggle the sort order for the next click and update the icon
+        headerElement.setAttribute("data-sort-order", isAscending ? "desc" : "asc");
+        var sortIcon = headerElement.querySelector(".sort-icon");
+        if (isAscending) {
+            sortIcon.innerHTML = '<i class="fas fa-sort-down"></i>';
+        } else {
+            sortIcon.innerHTML = '<i class="fas fa-sort-up"></i>';
+        }
+    }
+</script>
+
 
 
 <script>
