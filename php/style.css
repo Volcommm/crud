@@ -1,159 +1,171 @@
+/* Sfondo chiaro */
 body {
-			background-color: #f8f9fa; /* Sfondo chiaro */
-			color: #212529; /* Testo scuro */
-		}
-		
-		/* Contenitore generale con dimensioni compatte */
-		.container {
-			margin-top: 40px;
-			padding: 15px;
-			background-color: #ffffff;
-			border-radius: 6px;
-			box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-		}
-		
+    background-color: #f8f9fa; /* Sfondo chiaro */
+    color: #212529; /* Testo scuro */
+}
 
-		.table th, .table td {
-			vertical-align: middle;
-			color: #212529;
-			padding: 8px; /* Riduci leggermente il padding */
-			font-size: 12px; /* Riduci la dimensione del font */
-		}
-		
-		.table-responsive {
-			overflow-x: auto; /* Aggiunge lo scrolling orizzontale */
-			-webkit-overflow-scrolling: touch; /* Supporto per scrolling fluido */
-		}
-		
-		.table {
-			width: 100%; /* Mantiene la larghezza della tabella nel contenitore */
-			table-layout: auto; /* Permette alle colonne di adattarsi automaticamente */
-		}
+/* Contenitore generale con dimensioni compatte */
+.container {
+    margin-top: 40px;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
 
-		
-		.table-hover tbody tr:hover td {
-			background-color: #f1f3f5; /* Sfondo chiaro all'hover */
-		}
-		/* Stile per l'intestazione della tabella */
-		.table thead th {
-			background-color: #f08080; /* Colore di sfondo blu */
-			color: #ffffff; /* Colore del testo bianco */
-			text-align: left; /* Allinea il testo al centro */
-			font-weight: bold; /* Grassetto per il testo */
-		}
-		
-		/* Per aggiungere un effetto al passaggio del mouse sulle righe dell'intestazione */
-		.table thead th:hover {
-			background-color: #cd5c5c; /* Colore di sfondo più scuro al passaggio del mouse */
-		}
+/* Tabelle con dimensioni compatte */
+.table {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    width: 100%; /* Mantiene la larghezza della tabella nel contenitore */
+    table-layout: auto; /* Permette alle colonne di adattarsi automaticamente */
+}
 
-		
-		/* Stile pulsanti più compatti */
-		.btn {
-			border-radius: 20px;
-			padding: 8px 16px; /* Ridotto il padding */
-			font-size: 13px; /* Ridotto il font */
-			font-weight: 500; /* Font meno pesante */
-			text-transform: uppercase;
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Ombra più leggera */
-		}
-		
-		.btn-primary {
-			background-color: #007bff;
-			border-color: #007bff;
-			color: #fff;
-		}
-		
-		.btn-primary:hover {
-			background-color: #0056b3;
-			border-color: #004085;
-		}
-		
-		.btn-outline-light {
-			border-color: #007bff;
-			color: #007bff;
-		}
-		
-		.btn-outline-light:hover {
-			background-color: #007bff;
-			color: #fff;
-		}
-		
-		/* Modale compatto */
-		.modal-content {
-			background-color: #ffffff;
-			border-radius: 6px;
-		}
-		
-		.modal-header, .modal-footer {
-			background-color: #f1f3f5;
-		}
-		
-		.modal-body {
-			padding: 15px; /* Ridotto il padding */
-		}
-		
-		.modal-title {
-			font-size: 16px; /* Font più piccolo */
-		}
-		
-		/* Campi form più compatti */
-		.form-control, .form-select {
-			background-color: #ffffff;
-			color: #212529;
-			border: 1px solid #ced4da;
-			padding: 8px; /* Ridotto il padding */
-			font-size: 13px; /* Font più piccolo */
-			border-radius: 4px;
-		}
-		
-		.form-control::placeholder {
-			color: #6c757d;
-		}
+.table th, .table td {
+    vertical-align: middle;
+    color: #212529;
+    padding: 8px; /* Ridotto il padding */
+    font-size: 13px; /* Font ridotto */
+}
 
-		/* Allarga solo i filtri per Numero e Cliente */
-		#numeroSelect, #clienteSelect {
-			width: 100%;
-		}
-		
-		/* Mantieni la larghezza originale della barra di ricerca */
-		.input-group.w-50 {
-			width: 50% !important; /* Mantiene la dimensione della barra di ricerca */
-		}
-		
-		/* Distribuisce uniformemente le colonne dei filtri */
-		.row > .col-md-4 {
-			flex: 1;
-		}
-		/* Assicura che i filtri siano ben allineati e centrati */
-		.form-label {
-			display: block;
-			text-align: center;
-		}
-		/* Centra solo il pulsante Applica Filtri */
-		#filterForm .btn-primary {
-			display: block;
-			margin: 0 auto; /* Centra il pulsante */
-			width: 25%; /* Puoi modificare la larghezza a piacimento */
-		}
+/* Stile per l'intestazione della tabella */
+.table thead th {
+    background-color: #f08080; /* Colore di sfondo rosso chiaro */
+    color: #ffffff; /* Colore del testo bianco */
+    text-align: left; /* Allinea il testo a sinistra */
+    font-weight: bold; /* Grassetto per il testo */
+}
 
-		/* Stile compatto per la barra di navigazione */
-		.d-flex .btn {
-			margin-right: 8px;
-			padding: 8px 16px;
-			font-size: 13px;
-			border-radius: 20px;
-		}
-		/* Definisci una larghezza fissa per la colonna Azione */
-		.action-column {
-			width: 150px; /* Imposta una larghezza fissa */
-			text-align: right; /* Allinea il contenuto a destra */
-		}
-		.action-column .btn {
-			margin-right: 5px;
-		}
-		.sort-icon {
-		    margin-left: 10px;
-		    cursor: pointer;
-		}
+/* Effetto al passaggio del mouse sulle righe dell'intestazione */
+.table thead th:hover {
+    background-color: #cd5c5c; /* Colore di sfondo più scuro al passaggio del mouse */
+}
 
+/* Sfondo chiaro all'hover */
+.table-hover tbody tr:hover td {
+    background-color: #f1f3f5;
+}
+
+/* Stile pulsanti più compatti */
+.btn {
+    border-radius: 20px;
+    padding: 8px 16px; /* Ridotto il padding */
+    font-size: 13px; /* Ridotto il font */
+    font-weight: 500; /* Font meno pesante */
+    text-transform: uppercase;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Ombra più leggera */
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+.btn-outline-light {
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.btn-outline-light:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Modale compatto */
+.modal-content {
+    background-color: #ffffff;
+    border-radius: 6px;
+}
+
+.modal-header, .modal-footer {
+    background-color: #f1f3f5;
+}
+
+.modal-body {
+    padding: 15px; /* Ridotto il padding */
+}
+
+.modal-title {
+    font-size: 16px; /* Font più piccolo */
+}
+
+/* Campi form più compatti */
+.form-control, .form-select {
+    background-color: #ffffff;
+    color: #212529;
+    border: 1px solid #ced4da;
+    padding: 8px; /* Ridotto il padding */
+    font-size: 13px; /* Font più piccolo */
+    border-radius: 4px;
+}
+
+.form-control::placeholder {
+    color: #6c757d;
+}
+
+/* Stile compatto per la barra di navigazione */
+.d-flex .btn {
+    margin-right: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    border-radius: 20px;
+}
+
+/* Definisci una larghezza fissa per la colonna Azione */
+.action-column {
+    width: 150px; /* Imposta una larghezza fissa */
+    text-align: right; /* Allinea il contenuto a destra */
+}
+
+.action-column .btn {
+    margin-right: 5px;
+}
+
+/* Icona di ordinamento */
+.sort-icon {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+/* Stili specifici per la pagina 'Gestione Personale' */
+#gestione-personale .table th, #gestione-personale .table td {
+    padding: 10px; /* Ridotto il padding */
+    font-size: 14px; /* Font leggermente più grande */
+}
+
+/* Allarga solo i filtri per Nome e Tipologia */
+#gestione-personale #nomeSelect, #gestione-personale #tipologiaSelect {
+    width: 100%;
+}
+
+/* Centra solo il pulsante Applica Filtri per Gestione Personale */
+#gestione-personale #filterForm .btn-primary {
+    display: block;
+    margin: 0 auto; /* Centra il pulsante */
+    width: 25%;
+}
+
+/* Stili specifici per la pagina 'Gestione Commesse' */
+#gestione-commesse .table th, #gestione-commesse .table td {
+    padding: 8px; /* Ridotto il padding */
+    font-size: 12px; /* Font più piccolo */
+}
+
+/* Allarga solo i filtri per Numero e Cliente */
+#gestione-commesse #numeroSelect, #gestione-commesse #clienteSelect {
+    width: 100%;
+}
+
+/* Centra solo il pulsante Applica Filtri per Gestione Commesse */
+#gestione-commesse #filterForm .btn-primary {
+    display: block;
+    margin: 0 auto; /* Centra il pulsante */
+    width: 25%;
+}

@@ -166,177 +166,15 @@ if (!$result) {
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
+	<link rel="stylesheet" href="style.css">
 
-		/* Sfondo chiaro */
-		body {
-			background-color: #f8f9fa; /* Sfondo chiaro */
-			color: #212529; /* Testo scuro */
-		}
-		
-		/* Contenitore generale con dimensioni compatte */
-		.container {
-			margin-top: 40px;
-			padding: 15px;
-			background-color: #ffffff;
-			border-radius: 6px;
-			box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-		}
-		
-
-		.table th, .table td {
-			vertical-align: middle;
-			color: #212529;
-			padding: 8px; /* Riduci leggermente il padding */
-			font-size: 12px; /* Riduci la dimensione del font */
-		}
-		
-		.table-responsive {
-			overflow-x: auto; /* Aggiunge lo scrolling orizzontale */
-			-webkit-overflow-scrolling: touch; /* Supporto per scrolling fluido */
-		}
-		
-		.table {
-			width: 100%; /* Mantiene la larghezza della tabella nel contenitore */
-			table-layout: auto; /* Permette alle colonne di adattarsi automaticamente */
-		}
-
-		
-		.table-hover tbody tr:hover td {
-			background-color: #f1f3f5; /* Sfondo chiaro all'hover */
-		}
-		/* Stile per l'intestazione della tabella */
-		.table thead th {
-			background-color: #f08080; /* Colore di sfondo blu */
-			color: #ffffff; /* Colore del testo bianco */
-			text-align: left; /* Allinea il testo al centro */
-			font-weight: bold; /* Grassetto per il testo */
-		}
-		
-		/* Per aggiungere un effetto al passaggio del mouse sulle righe dell'intestazione */
-		.table thead th:hover {
-			background-color: #cd5c5c; /* Colore di sfondo più scuro al passaggio del mouse */
-		}
-
-		
-		/* Stile pulsanti più compatti */
-		.btn {
-			border-radius: 20px;
-			padding: 8px 16px; /* Ridotto il padding */
-			font-size: 13px; /* Ridotto il font */
-			font-weight: 500; /* Font meno pesante */
-			text-transform: uppercase;
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Ombra più leggera */
-		}
-		
-		.btn-primary {
-			background-color: #007bff;
-			border-color: #007bff;
-			color: #fff;
-		}
-		
-		.btn-primary:hover {
-			background-color: #0056b3;
-			border-color: #004085;
-		}
-		
-		.btn-outline-light {
-			border-color: #007bff;
-			color: #007bff;
-		}
-		
-		.btn-outline-light:hover {
-			background-color: #007bff;
-			color: #fff;
-		}
-		
-		/* Modale compatto */
-		.modal-content {
-			background-color: #ffffff;
-			border-radius: 6px;
-		}
-		
-		.modal-header, .modal-footer {
-			background-color: #f1f3f5;
-		}
-		
-		.modal-body {
-			padding: 15px; /* Ridotto il padding */
-		}
-		
-		.modal-title {
-			font-size: 16px; /* Font più piccolo */
-		}
-		
-		/* Campi form più compatti */
-		.form-control, .form-select {
-			background-color: #ffffff;
-			color: #212529;
-			border: 1px solid #ced4da;
-			padding: 8px; /* Ridotto il padding */
-			font-size: 13px; /* Font più piccolo */
-			border-radius: 4px;
-		}
-		
-		.form-control::placeholder {
-			color: #6c757d;
-		}
-
-		/* Allarga solo i filtri per Numero e Cliente */
-		#numeroSelect, #clienteSelect {
-			width: 100%;
-		}
-		
-		/* Mantieni la larghezza originale della barra di ricerca */
-		.input-group.w-50 {
-			width: 50% !important; /* Mantiene la dimensione della barra di ricerca */
-		}
-		
-		/* Distribuisce uniformemente le colonne dei filtri */
-		.row > .col-md-4 {
-			flex: 1;
-		}
-		/* Assicura che i filtri siano ben allineati e centrati */
-		.form-label {
-			display: block;
-			text-align: center;
-		}
-		/* Centra solo il pulsante Applica Filtri */
-		#filterForm .btn-primary {
-			display: block;
-			margin: 0 auto; /* Centra il pulsante */
-			width: 25%; /* Puoi modificare la larghezza a piacimento */
-		}
-
-		/* Stile compatto per la barra di navigazione */
-		.d-flex .btn {
-			margin-right: 8px;
-			padding: 8px 16px;
-			font-size: 13px;
-			border-radius: 20px;
-		}
-		/* Definisci una larghezza fissa per la colonna Azione */
-		.action-column {
-			width: 150px; /* Imposta una larghezza fissa */
-			text-align: right; /* Allinea il contenuto a destra */
-		}
-		.action-column .btn {
-			margin-right: 5px;
-		}
-		.sort-icon {
-		    margin-left: 10px;
-		    cursor: pointer;
-		}
-
-
-    </style>
 </head>
-<body>
+<body id="gestione-commesse">
     <div class="container">
         <div class="d-flex justify-content-between mb-3">
-            <a href="index.php" class="btn btn-outline-light">Home</a>
-            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addModal">Aggiungi Commessa</button>
-            <a href="logout.php" class="btn btn-outline-danger">Logout</a>
+            <a href="index.php" class="btn btn-outline-light"><i class="fas fa-home"></i> Home</a>
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fas fa-user-plus"></i> Aggiungi Personale</button>
+            <a href="logout.php" class="btn btn-outline-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
 		<?php 
 		// Ottieni i parametri della query string (filtri e ricerca attuali)
@@ -352,7 +190,7 @@ if (!$result) {
         <form action="commesse.php" method="GET" class="mb-3 text-center">
             <div class="input-group w-50 mx-auto">
                 <input type="text" name="search" class="form-control" id="search" placeholder="Inserisci termine da cercare">
-                <button type="submit" class="btn btn-primary">Cerca</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Cerca</button>
             </div>
         </form>
 
