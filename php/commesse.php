@@ -184,22 +184,22 @@ if (!$result) {
 		}
 		
 
-.table th, .table td {
-    vertical-align: middle;
-    color: #212529;
-    padding: 8px; /* Riduci leggermente il padding */
-    font-size: 12px; /* Riduci la dimensione del font */
-}
-
-.table-responsive {
-    overflow-x: auto; /* Aggiunge lo scrolling orizzontale */
-    -webkit-overflow-scrolling: touch; /* Supporto per scrolling fluido */
-}
-
-.table {
-    width: 100%; /* Mantiene la larghezza della tabella nel contenitore */
-    table-layout: auto; /* Permette alle colonne di adattarsi automaticamente */
-}
+		.table th, .table td {
+			vertical-align: middle;
+			color: #212529;
+			padding: 8px; /* Riduci leggermente il padding */
+			font-size: 12px; /* Riduci la dimensione del font */
+		}
+		
+		.table-responsive {
+			overflow-x: auto; /* Aggiunge lo scrolling orizzontale */
+			-webkit-overflow-scrolling: touch; /* Supporto per scrolling fluido */
+		}
+		
+		.table {
+			width: 100%; /* Mantiene la larghezza della tabella nel contenitore */
+			table-layout: auto; /* Permette alle colonne di adattarsi automaticamente */
+		}
 
 		
 		.table-hover tbody tr:hover td {
@@ -334,6 +334,15 @@ if (!$result) {
             <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addModal">Aggiungi Commessa</button>
             <a href="logout.php" class="btn btn-outline-danger">Logout</a>
         </div>
+		<?php 
+		// Ottieni i parametri della query string (filtri e ricerca attuali)
+		$queryString = $_SERVER['QUERY_STRING'];
+		?>
+		<div class="mb-3 text-center">
+			<a href="javascript:void(0)" class="btn btn-success" onclick="exportToExcel('<?php echo $queryString; ?>')">Esporta in Excel</a>
+			<a href="javascript:void(0)" class="btn btn-danger" onclick="exportToPDF('<?php echo $queryString; ?>')">Esporta in PDF</a>
+		</div>
+		
 
         <!-- Form for searching commessa -->
         <form action="commesse.php" method="GET" class="mb-3 text-center">
@@ -670,44 +679,45 @@ if (!$result) {
 		}
 
 
-		function exportToPDF(queryString) {
-			var { jsPDF } = window.jspdf;
-			var doc = new jsPDF();
-		
-			// Seleziona solo la tabella visibile (dopo i filtri o la ricerca)
-			var table = document.querySelector("table");
-		
-			// Usa jsPDF AutoTable per generare la tabella nel PDF escludendo l'ultima colonna
-			doc.autoTable({
-				html: table,
-				theme: 'striped',
-				headStyles: { fillColor: [22, 160, 133] },
-				didParseCell: function(data) {
-					// Evita la colonna "Azione" (indice 2, terza colonna)
-					if (data.column.index === 2) {
-						data.cell.text = '';  // Rimuovi il testo della cella
-					}
-				},
-				// Specifica le colonne da includere (0: Numero, 1: Cliente)
-				columns: [
-					{ header: 'Numero Commessa', dataKey: 'numero' },
-					{ header: 'Cliente', dataKey: 'cliente' }
-				],
-				// Imposta i dati da includere nel PDF
-				body: Array.from(table.querySelectorAll('tbody tr')).map(row => {
-					return {
-						numero: row.cells[0].innerText, // Numero
-						cliente: row.cells[1].innerText // Cliente
-					};
-				})
-			});
-		
-			// Aggiungi i filtri alla query string per il nome del file
-			var filename = "commesse_filtrate_" + queryString.replace(/[^a-zA-Z0-9]/g, '_') + ".pdf";
-		
-			// Salva il PDF con il nome che include i filtri
-			doc.save(filename);
-		}
+
+    function exportToPDF(queryString) {
+        var { jsPDF } = window.jspdf;
+        var doc = new jsPDF();
+
+        // Seleziona solo la tabella visibile (dopo i filtri o la ricerca)
+        var table = document.querySelector("table");
+
+        // Usa jsPDF AutoTable per generare la tabella nel PDF con tutte le colonne
+        doc.autoTable({
+            head: [
+                ['Numero Commessa', 'Riferimento Offerta', 'Stato', 'Data Apertura', 'Cliente', 'Descrizione Lavoro', 'Offerta in Uscita', 'Costo Totale Previsto', 'Costo Fornitori Previsto', 'Costo Personale Previsto', 'Data Chiusura']
+            ],
+            body: Array.from(table.querySelectorAll('tbody tr')).map(row => {
+                return [
+                    row.cells[0].innerText, // Numero Commessa
+                    row.cells[1].innerText, // Riferimento Offerta
+                    row.cells[2].innerText, // Stato
+                    row.cells[3].innerText, // Data Apertura
+                    row.cells[4].innerText, // Cliente
+                    row.cells[5].innerText, // Descrizione Lavoro
+                    row.cells[6].innerText, // Offerta in Uscita
+                    row.cells[7].innerText, // Costo Totale Previsto
+                    row.cells[8].innerText, // Costo Fornitori Previsto
+                    row.cells[9].innerText, // Costo Personale Previsto
+                    row.cells[10].innerText // Data Chiusura
+                ];
+            }),
+            theme: 'striped',
+            headStyles: { fillColor: [22, 160, 133] },
+        });
+
+        // Aggiungi i filtri alla query string per il nome del file
+        var filename = "commesse_filtrate_" + queryString.replace(/[^a-zA-Z0-9]/g, '_') + ".pdf";
+
+        // Salva il PDF con il nome che include i filtri
+        doc.save(filename);
+    }
+
 </script>
 </body>
 </html>
