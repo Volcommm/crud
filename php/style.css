@@ -105,11 +105,18 @@ body {
     font-size: 13px; /* Font più piccolo */
     border-radius: 4px;
 }
-
+/* Assicura che i filtri siano ben allineati e centrati */
+.form-label {
+	display: block;
+	text-align: center;
+}
 .form-control::placeholder {
     color: #6c757d;
 }
-
+/* Distribuisce uniformemente le colonne dei filtri */
+.row > .col-md-4 {
+	flex: 1;
+}
 /* Stile compatto per la barra di navigazione */
 .d-flex .btn {
     margin-right: 8px;
