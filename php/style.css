@@ -227,3 +227,27 @@ h1.text-center.display-4::before, h1.text-center.display-4::after {
     margin: 0 auto; /* Centra il pulsante */
     width: 25%;
 }
+
+/* Assicura che i filtri per il fornitore siano centrati */
+#gestione-fornitore #filterForm {
+    display: flex;
+    justify-content: center; /* Centra orizzontalmente */
+    flex-direction: column; /* Imposta gli elementi in colonna */
+    align-items: center; /* Centra tutti gli elementi all'interno */
+    gap: 20px; /* Spazio tra il filtro e il pulsante */
+}
+
+#gestione-fornitore #filterForm .row {
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Centra la riga del filtro */
+}
+
+#gestione-fornitore #filterForm .form-select {
+    width: 100%; /* Imposta una larghezza per il dropdown del filtro fornitore */
+}
+
+#gestione-fornitore #filterForm button {
+    width: 20%; /* Imposta la larghezza del pulsante */
+}
+
