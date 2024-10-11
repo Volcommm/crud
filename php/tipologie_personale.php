@@ -193,7 +193,7 @@ if (!$result) {
                 <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['tipologia']); ?></td>
-                        <td><?php echo htmlspecialchars($row['paga']); ?></td>
+                        <td><?php echo '€ ' . number_format($row['paga'], 2, ',', '.'); ?></td>
                         <td class="action-column">
                             <div class="d-flex justify-content-end">
                                 <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $row['idtipologia']; ?>"><i class="fas fa-edit"></i></button>
@@ -361,19 +361,27 @@ function sortTable(columnIndex, headerElement) {
         }
 
         // Funzione per resettare i filtri
-        function resetFilters() {
-            const filterForm = document.getElementById('filterForm');
-            if (filterForm) {
-                // Resetta i filtri selezionati
-                filterForm.reset();
-
-                // Deseleziona manualmente tutte le opzioni multiple
-                const selectElements = filterForm.querySelectorAll('select[multiple]');
-                selectElements.forEach(select => {
-                    Array.from(select.options).forEach(option => option.selected = false);
-                });
-            }
-        }
+		function resetFilters() {
+			const filterForm = document.getElementById('filterForm');
+			if (filterForm) {
+				// Resetta i campi del form, compresa la barra di ricerca
+				filterForm.reset();
+		
+				// Resetta la barra di ricerca (se presente)
+				const searchInput = document.querySelector('input[name="search"]');
+				if (searchInput) {
+					searchInput.value = ''; // Resetta il campo di input della ricerca
+				}
+		
+				// Deseleziona manualmente tutte le opzioni multiple
+				const selectElements = filterForm.querySelectorAll('select[multiple]');
+				selectElements.forEach(select => {
+					Array.from(select.options).forEach(option => option.selected = false);
+				});
+		
+				
+			}
+		}
 
         // Aggiungi event listener per il form di ricerca
         const searchForm = document.querySelector('form[action="tipologie_personale.php"]');

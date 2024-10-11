@@ -260,10 +260,35 @@ if (!$result) {
                         <td><?php echo htmlspecialchars($row['dataapertura']); ?></td>
                         <td><?php echo htmlspecialchars($row['cliente']); ?></td>
                         <td><?php echo htmlspecialchars($row['deslavoro']); ?></td>
-                        <td><?php echo htmlspecialchars($row['costooffertauscita']); ?></td>
-                        <td><?php echo htmlspecialchars($row['costo_tot_comm_prev']); ?></td>
-                        <td><?php echo htmlspecialchars($row['costo_tot_forn_prev']); ?></td>
-                        <td><?php echo htmlspecialchars($row['costo_tot_pers_prev']); ?></td>
+						<td>
+							<?php 
+							echo '€ ' . (floor($row['costooffertauscita']) == $row['costooffertauscita'] 
+										? number_format($row['costooffertauscita'], 0, ',', '.') 
+										: number_format($row['costooffertauscita'], 2, ',', '.')); 
+							?>
+						</td>
+						<td>
+							<?php 
+							echo '€ ' . (floor($row['costo_tot_comm_prev']) == $row['costo_tot_comm_prev'] 
+										? number_format($row['costo_tot_comm_prev'], 0, ',', '.') 
+										: number_format($row['costo_tot_comm_prev'], 2, ',', '.')); 
+							?>
+						</td>
+						<td>
+							<?php 
+							echo '€ ' . (floor($row['costo_tot_forn_prev']) == $row['costo_tot_forn_prev'] 
+										? number_format($row['costo_tot_forn_prev'], 0, ',', '.') 
+										: number_format($row['costo_tot_forn_prev'], 2, ',', '.')); 
+							?>
+						</td>
+						<td>
+							<?php 
+							echo '€ ' . (floor($row['costo_tot_pers_prev']) == $row['costo_tot_pers_prev'] 
+										? number_format($row['costo_tot_pers_prev'], 0, ',', '.') 
+										: number_format($row['costo_tot_pers_prev'], 2, ',', '.')); 
+							?>
+						</td>
+					
                         <td><?php echo htmlspecialchars($row['datachiusura']); ?></td>
                         <td class="action-column">
 							<div class="d-flex justify-content-end">
@@ -316,22 +341,22 @@ if (!$result) {
                                             <label for="deslavoro" class="form-label">Descrizione Lavoro</label>
                                             <textarea name="deslavoro" class="form-control" id="deslavoro"><?php echo htmlspecialchars($row['deslavoro']); ?></textarea>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="costooffertauscita" class="form-label">Offerta in Uscita</label>
-                                            <input type="text" name="costooffertauscita" class="form-control" id="costooffertauscita" value="<?php echo htmlspecialchars($row['costooffertauscita']); ?>">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="costo_tot_comm_prev" class="form-label">Costo Totale Previsto</label>
-                                            <input type="text" name="costo_tot_comm_prev" class="form-control" id="costo_tot_comm_prev" value="<?php echo htmlspecialchars($row['costo_tot_comm_prev']); ?>">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="costo_tot_forn_prev" class="form-label">Costo Fornitori Previsto</label>
-                                            <input type="text" name="costo_tot_forn_prev" class="form-control" id="costo_tot_forn_prev" value="<?php echo htmlspecialchars($row['costo_tot_forn_prev']); ?>">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="costo_tot_pers_prev" class="form-label">Costo Personale Previsto</label>
-                                            <input type="text" name="costo_tot_pers_prev" class="form-control" id="costo_tot_pers_prev" value="<?php echo htmlspecialchars($row['costo_tot_pers_prev']); ?>">
-                                        </div>
+										<div class="mb-3">
+											<label for="costooffertauscita" class="form-label">Offerta in Uscita</label>
+											<input type="number" step="0.01" name="costooffertauscita" class="form-control" id="costooffertauscita" value="<?php echo htmlspecialchars($row['costooffertauscita']); ?>">
+										</div>
+										<div class="mb-3">
+											<label for="costo_tot_comm_prev" class="form-label">Costo Totale Previsto</label>
+											<input type="number" step="0.01" name="costo_tot_comm_prev" class="form-control" id="costo_tot_comm_prev" value="<?php echo htmlspecialchars($row['costo_tot_comm_prev']); ?>">
+										</div>
+										<div class="mb-3">
+											<label for="costo_tot_forn_prev" class="form-label">Costo Fornitori Previsto</label>
+											<input type="number" step="0.01" name="costo_tot_forn_prev" class="form-control" id="costo_tot_forn_prev" value="<?php echo htmlspecialchars($row['costo_tot_forn_prev']); ?>">
+										</div>
+										<div class="mb-3">
+											<label for="costo_tot_pers_prev" class="form-label">Costo Personale Previsto</label>
+											<input type="number" step="0.01" name="costo_tot_pers_prev" class="form-control" id="costo_tot_pers_prev" value="<?php echo htmlspecialchars($row['costo_tot_pers_prev']); ?>">
+										</div>
                                         <div class="mb-3">
                                             <label for="datachiusura" class="form-label">Data Chiusura</label>
                                             <input type="date" name="datachiusura" class="form-control" id="datachiusura" value="<?php echo htmlspecialchars($row['datachiusura']); ?>">
@@ -390,22 +415,22 @@ if (!$result) {
                             <label for="descrizione_lavoro" class="form-label">Descrizione Lavoro</label>
                             <textarea name="deslavoro" class="form-control" id="deslavoro"></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label for="offerta_uscita" class="form-label">Offerta in Uscita</label>
-                            <input type="text" name="costooffertauscita" class="form-control" id="costooffertauscita">
-                        </div>
-                        <div class="mb-3">
-                            <label for="costo_totale_prev" class="form-label">Costo Totale Previsto</label>
-                            <input type="text" name="costo_tot_comm_prev" class="form-control" id="costo_tot_comm_prev">
-                        </div>
-                        <div class="mb-3">
-                            <label for="costo_fornitori_prev" class="form-label">Costo Fornitori Previsto</label>
-                            <input type="text" name="costo_tot_forn_prev" class="form-control" id="costo_tot_forn_prev">
-                        </div>
-                        <div class="mb-3">
-                            <label for="costo_personale_prev" class="form-label">Costo Personale Previsto</label>
-                            <input type="text" name="costo_tot_pers_prev" class="form-control" id="costo_tot_pers_prev">
-                        </div>
+						<div class="mb-3">
+							<label for="costooffertauscita" class="form-label">Offerta in Uscita</label>
+							<input type="number" step="0.01" name="costooffertauscita" class="form-control" id="costooffertauscita">
+						</div>
+						<div class="mb-3">
+							<label for="costo_tot_comm_prev" class="form-label">Costo Totale Previsto</label>
+							<input type="number" step="0.01" name="costo_tot_comm_prev" class="form-control" id="costo_tot_comm_prev">
+						</div>
+						<div class="mb-3">
+							<label for="costo_tot_forn_prev" class="form-label">Costo Fornitori Previsto</label>
+							<input type="number" step="0.01" name="costo_tot_forn_prev" class="form-control" id="costo_tot_forn_prev">
+						</div>
+						<div class="mb-3">
+							<label for="costo_tot_pers_prev" class="form-label">Costo Personale Previsto</label>
+							<input type="number" step="0.01" name="costo_tot_pers_prev" class="form-control" id="costo_tot_pers_prev">
+						</div>
                         <div class="mb-3">
                             <label for="data_chiusura" class="form-label">Data Chiusura</label>
                             <input type="date" name="datachiusura" class="form-control" id="datachiusura">

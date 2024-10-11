@@ -326,19 +326,28 @@ if (!$result) {
         }
 
         // Funzione per resettare i filtri
-        function resetFilters() {
-            const filterForm = document.getElementById('filterForm');
-            if (filterForm) {
-                // Resetta i filtri selezionati
-                filterForm.reset();
+		function resetFilters() {
+			const filterForm = document.getElementById('filterForm');
+			if (filterForm) {
+				// Resetta i campi del form, compresa la barra di ricerca
+				filterForm.reset();
+		
+				// Resetta la barra di ricerca (se presente)
+				const searchInput = document.querySelector('input[name="search"]');
+				if (searchInput) {
+					searchInput.value = ''; // Resetta il campo di input della ricerca
+				}
+		
+				// Deseleziona manualmente tutte le opzioni multiple
+				const selectElements = filterForm.querySelectorAll('select[multiple]');
+				selectElements.forEach(select => {
+					Array.from(select.options).forEach(option => option.selected = false);
+				});
+		
+				
+			}
+		}
 
-                // Deseleziona manualmente tutte le opzioni multiple
-                const selectElements = filterForm.querySelectorAll('select[multiple]');
-                selectElements.forEach(select => {
-                    Array.from(select.options).forEach(option => option.selected = false);
-                });
-            }
-        }
 
         // Aggiungi event listener per il form di ricerca
         const searchForm = document.querySelector('form[action="fornitori.php"]');
