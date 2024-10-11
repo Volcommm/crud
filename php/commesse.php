@@ -181,8 +181,8 @@ if (!$result) {
 		$queryString = $_SERVER['QUERY_STRING'];
 		?>
 		<div class="mb-3 text-center">
-			<a href="javascript:void(0)" class="btn btn-success" onclick="exportToExcel('<?php echo $queryString; ?>')">Esporta in Excel</a>
-			<a href="javascript:void(0)" class="btn btn-danger" onclick="exportToPDF('<?php echo $queryString; ?>')">Esporta in PDF</a>
+			<a href="javascript:void(0)" class="btn btn-success" onclick="exportToExcel('<?php echo $queryString; ?>')"><i class="fas fa-file-excel"></i> Esporta in Excel</a>
+			<a href="javascript:void(0)" class="btn btn-danger" onclick="exportToPDF('<?php echo $queryString; ?>')"><i class="fas fa-file-pdf"></i> Esporta in PDF</a>
 		</div>
 		
 
@@ -190,7 +190,7 @@ if (!$result) {
         <form action="commesse.php" method="GET" class="mb-3 text-center">
             <div class="input-group w-50 mx-auto">
                 <input type="text" name="search" class="form-control" id="search" placeholder="Inserisci termine da cercare">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Cerca</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
             </div>
         </form>
 
@@ -220,7 +220,7 @@ if (!$result) {
 					</select>
 				</div>
 			</div>
-			<button type="submit" class="btn btn-primary mt-3">Applica Filtri</button>
+			<button type="submit" class="btn btn-primary mt-3"><i class="fas fa-filter"></i> Applica Filtri</button>
 		</form>
 
         <!-- Display error messages -->
@@ -266,8 +266,8 @@ if (!$result) {
                         <td><?php echo htmlspecialchars($row['datachiusura']); ?></td>
                         <td class="action-column">
 							<div class="d-flex justify-content-end">
-                            <button class="btn btn-edit btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $row['idcommessa']; ?>">Modifica</button>
-                            <a href="commesse.php?delete_id=<?php echo $row['idcommessa']; ?>" class="btn btn-delete btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questa commessa?');">Cancella</a>
+                            <button class="btn btn-edit btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $row['idcommessa']; ?>"><i class="fas fa-edit"></i></button>
+                            <a href="commesse.php?delete_id=<?php echo $row['idcommessa']; ?>" class="btn btn-delete btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questa commessa?');"><i class="fas fa-trash-alt"></i></a>
                         </td>
                     </tr>
 
