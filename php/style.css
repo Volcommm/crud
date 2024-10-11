@@ -1,8 +1,59 @@
-/* Sfondo chiaro */
 body {
     background-color: #f8f9fa; /* Sfondo chiaro */
     color: #212529; /* Testo scuro */
 }
+h1.text-center.display-4 {
+    position: relative;
+    font-weight: bold !important;
+    color: #34495e !important; /* Colore professionale */
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 30px !important;
+    padding-bottom: 10px !important;
+    background: none !important;
+    overflow: hidden; /* Per gestire l'animazione che esce dai bordi */
+}
+
+h1.text-center.display-4::before, h1.text-center.display-4::after {
+    content: '';
+    position: absolute;
+    height: 2px;
+    width: 50%;
+    bottom: 0;
+    background-color: #2980b9;
+    transition: all 0.4s ease;
+    z-index: 1; /* Per posizionarla sopra il testo */
+}
+
+h1.text-center.display-4::before {
+    left: 0;
+    background-color: #2980b9;
+}
+
+h1.text-center.display-4::after {
+    right: 0;
+    background-color: #e74c3c;
+}
+
+h1.text-center.display-4:hover::before, h1.text-center.display-4:hover::after {
+    width: 100%;
+    background-color: #2ecc71; /* Cambia colore durante l'animazione */
+}
+
+h1.text-center.display-4::before, h1.text-center.display-4::after {
+    animation: move-bar 2s ease infinite alternate;
+}
+
+@keyframes move-bar {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+
 
 /* Contenitore generale con dimensioni compatte */
 .container {

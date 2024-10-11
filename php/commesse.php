@@ -171,9 +171,10 @@ if (!$result) {
 </head>
 <body id="gestione-commesse">
     <div class="container">
+	<h1 class="text-center display-4 mb-4">Gestione Commesse</h1>
         <div class="d-flex justify-content-between mb-3">
             <a href="index.php" class="btn btn-outline-light"><i class="fas fa-home"></i> Home</a>
-            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fas fa-user-plus"></i> Aggiungi Personale</button>
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fas fa-user-plus"></i> Aggiungi Commessa</button>
             <a href="logout.php" class="btn btn-outline-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
 		<?php 
