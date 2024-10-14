@@ -119,13 +119,16 @@ $clienteQuery = "SELECT DISTINCT c.idcliente, c.cliente FROM commesse co
                    JOIN clienti c ON co.idcliente = c.idcliente";
 $clienteResult = mysqli_query($mysqli, $clienteQuery);
 
-// Modifica della query per filtrare le commesse
-$query = "SELECT co.*, c.cliente FROM commesse co LEFT JOIN clienti c ON co.idcliente = c.idcliente WHERE co.stato != 'Archiviata'";
+// Construct the query with JOIN to fetch commesse
+$query = "SELECT co.*, c.cliente 
+          FROM commesse co
+          LEFT JOIN clienti c ON co.idcliente = c.idcliente";
+
 
 // Add search filter if provided
 if (!empty($_GET['search'])) {
     $searchTerm = mysqli_real_escape_string($mysqli, $_GET['search']);
-    $query .= " AND (co.numero LIKE '%$searchTerm%' OR c.cliente LIKE '%$searchTerm%')";
+    $query .= " WHERE (co.numero LIKE '%$searchTerm%' OR c.cliente LIKE '%$searchTerm%')";
 }
 
 // Add filter by numero
@@ -134,28 +137,19 @@ if (!empty($_GET['numero'])) {
     $numeroFilter = implode("','", array_map(function($numero) use ($mysqli) {
         return mysqli_real_escape_string($mysqli, $numero);
     }, $numeri));
-    $query .= " AND co.numero IN ('$numeroFilter')";
+    $query .= !empty($_GET['search']) ? " AND co.numero IN ('$numeroFilter')" : " WHERE co.numero IN ('$numeroFilter')";
 }
 
 // Add filter by cliente
 if (!empty($_GET['idcliente'])) {
     $clienti = $_GET['idcliente'];
     $clienteFilter = implode(",", array_map('intval', $clienti));
-    $query .= " AND co.idcliente IN ($clienteFilter)";
-}
-
-// Add filter by stato
-if (!empty($_GET['stato'])) {
-    $stati = $_GET['stato'];
-    $statoFilter = implode("','", array_map(function($stato) use ($mysqli) {
-        return mysqli_real_escape_string($mysqli, $stato);
-    }, $stati));
-    $query .= " AND co.stato IN ('$statoFilter')";
+    $query .= (!empty($_GET['search']) || !empty($_GET['numero'])) ? " AND co.idcliente IN ($clienteFilter)" : " WHERE co.idcliente IN ($clienteFilter)";
 }
 
 $query .= " ORDER BY co.idcommessa DESC";
-$result = mysqli_query($mysqli, $query);
 
+$result = mysqli_query($mysqli, $query);
 
 // Controllo errori SQL
 if (!$result) {
@@ -191,14 +185,7 @@ if (!$result) {
 			<a href="javascript:void(0)" class="btn btn-success" onclick="exportToExcel('<?php echo $queryString; ?>')"><i class="fas fa-file-excel"></i> Esporta in Excel</a>
 			<a href="javascript:void(0)" class="btn btn-danger" onclick="exportToPDF('<?php echo $queryString; ?>')"><i class="fas fa-file-pdf"></i> Esporta in PDF</a>
 		</div>
-
-		<!-- Bottone per mostrare le commesse archiviate -->
-		<div class="mb-3 text-center">
-			<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#archiviateModal">
-				<i class="fas fa-archive"></i> Mostra Archiviati
-			</button>
-		</div>
-
+		
 
         <!-- Form for searching commessa -->
         <form action="commesse.php" method="GET" class="mb-3 text-center">
@@ -207,7 +194,8 @@ if (!$result) {
                 <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
             </div>
         </form>
-		<!-- Form for filtering commesse -->
+
+        <!-- Form for filtering commesse -->
 		<form id="filterForm" action="commesse.php" method="GET" class="mb-3">
 			<div class="row">
 				<div class="col-md-4">
@@ -232,19 +220,9 @@ if (!$result) {
 						<?php } ?>
 					</select>
 				</div>
-				<div class="col-md-4">
-					<label for="stato" class="form-label">Filtra per Stato</label>
-					<select name="stato[]" class="form-select" multiple id="statoSelect">
-						<option value="" data-select-all>Seleziona tutto</option>
-						<option value="aperta">Aperta</option>
-						<option value="Chiusa">Chiusa</option>
-					</select>
-				</div>
 			</div>
 			<button type="submit" class="btn btn-primary mt-3"><i class="fas fa-filter"></i> Applica Filtri</button>
 		</form>
-
-       
 
         <!-- Display error messages -->
         <?php if (isset($errorMessages)): ?>
@@ -338,14 +316,10 @@ if (!$result) {
                                             <label for="rifoff" class="form-label">Riferimento Offerta</label>
                                             <input type="text" name="rifoff" class="form-control" id="rifoff" value="<?php echo htmlspecialchars($row['rifoff']); ?>">
                                         </div>
-										<div class="mb-3">
-											<label for="stato" class="form-label">Stato</label>
-											<select name="stato" class="form-select" id="stato" required>
-												<option value="Aperta" <?php if ($row['stato'] == 'Aperta') echo 'selected'; ?>>Aperta</option>
-												<option value="Chiusa" <?php if ($row['stato'] == 'Chiusa') echo 'selected'; ?>>Chiusa</option>
-												<option value="Archiviata" <?php if ($row['stato'] == 'Archiviata') echo 'selected'; ?>>Archiviata</option>
-											</select>
-										</div>
+                                        <div class="mb-3">
+                                            <label for="stato" class="form-label">Stato</label>
+                                            <input type="text" name="stato" class="form-control" id="stato" value="<?php echo htmlspecialchars($row['stato']); ?>">
+                                        </div>
                                         <div class="mb-3">
                                             <label for="dataapertura" class="form-label">Data Apertura</label>
                                             <input type="date" name="dataapertura" class="form-control" id="dataapertura" value="<?php echo htmlspecialchars($row['dataapertura']); ?>">
@@ -416,14 +390,10 @@ if (!$result) {
                             <label for="rifoff" class="form-label">Riferimento Offerta</label>
                             <input type="text" name="rifoff" class="form-control" id="rifoff">
                         </div>
-						<div class="mb-3">
-							<label for="stato" class="form-label">Stato</label>
-							<select name="stato" class="form-select" id="stato" required>
-								<option value="Aperta">Aperta</option>
-								<option value="Chiusa">Chiusa</option>
-								<option value="Archiviata">Archiviata</option>
-							</select>
-						</div>
+                        <div class="mb-3">
+                            <label for="stato" class="form-label">Stato</label>
+                            <input type="text" name="stato" class="form-control" id="stato">
+                        </div>
                         <div class="mb-3">
                             <label for="dataapertura" class="form-label">Data Apertura</label>
                             <input type="date" name="dataapertura" class="form-control" id="dataapertura" value="<?php echo isset($row['dataapertura']) ? htmlspecialchars($row['dataapertura']) : ''; ?>">
@@ -472,62 +442,6 @@ if (!$result) {
         </div>
     </div>
 
-<!-- Modal for viewing archived commesse -->
-<div class="modal fade" id="archiviateModal" tabindex="-1" aria-labelledby="archiviateModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="archiviateModalLabel">Commesse Archiviate</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <?php
-                // Query per ottenere le commesse archiviate
-                $archiviateQuery = "SELECT co.*, c.cliente FROM commesse co LEFT JOIN clienti c ON co.idcliente = c.idcliente WHERE co.stato = 'Archiviata'";
-                $archiviateResult = mysqli_query($mysqli, $archiviateQuery);
-
-                if (mysqli_num_rows($archiviateResult) > 0) { ?>
-                    <table class="table table-hover table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Numero Commessa</th>
-                                <th>Cliente</th>
-                                <th>Descrizione Lavoro</th>
-                                <th>Data Chiusura</th>
-                                <th>Azioni</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($archiviateRow = mysqli_fetch_assoc($archiviateResult)) { ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($archiviateRow['numero']); ?></td>
-                                    <td><?php echo htmlspecialchars($archiviateRow['cliente']); ?></td>
-                                    <td><?php echo htmlspecialchars($archiviateRow['deslavoro']); ?></td>
-                                    <td><?php echo htmlspecialchars($archiviateRow['datachiusura']); ?></td>
-                                    <td class="action-column">
-                                        <!-- Pulsante per modificare lo stato -->
-                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $archiviateRow['idcommessa']; ?>">
-                                            <i class="fas fa-edit"></i> Modifica Stato
-                                        </button>
-                                        <!-- Pulsante per eliminare -->
-                                        <a href="commesse.php?delete_id=<?php echo $archiviateRow['idcommessa']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Sei sicuro di voler eliminare questa commessa archiviata?');">
-                                            <i class="fas fa-trash-alt"></i> Elimina
-                                        </a>
-                                    </td>
-                                </tr>
-
-                                <!-- Include il modale di modifica stato per la commessa archiviata -->
-                                <?php include 'edit_commessa_modal.php'; ?>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                <?php } else { ?>
-                    <p class="text-center">Non ci sono commesse archiviate al momento.</p>
-                <?php } ?>
-            </div>
-        </div>
-    </div>
-</div>
 
     <!-- Bootstrap 5 JS for modal functionality -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -713,18 +627,6 @@ function sortTable(columnIndex, thElement) {
         // Salva il PDF con il nome che include i filtri
         doc.save(filename);
     }
-
-</script>
-
-<!-- Aggiungi il seguente script per gestire i modali sovrapposti -->
-<script>
-$('#archiviateModal').on('hidden.bs.modal', function () {
-    if ($('.modal:visible').length) { 
-        $('body').addClass('modal-open');
-    } else {
-        $('body').removeClass('modal-open');
-    }
-});
 
 </script>
 </body>
