@@ -59,7 +59,7 @@ if (isset($_POST['update'])) {
     $stato = mysqli_real_escape_string($mysqli, $_POST['stato']);
     $dataapertura = mysqli_real_escape_string($mysqli, $_POST['dataapertura']);
     $idcliente = (int) $_POST['idcliente'];
-    $deslavoro = mysqli_real_escape_string($mysqli, $_POST['descrizione_lavoro']);
+    $deslavoro = mysqli_real_escape_string($mysqli, $_POST['deslavoro']);
     $costooffertauscita = mysqli_real_escape_string($mysqli, $_POST['costooffertauscita']);
     $costo_tot_comm_prev = mysqli_real_escape_string($mysqli, $_POST['costo_tot_comm_prev']);
     $costo_tot_forn_prev = mysqli_real_escape_string($mysqli, $_POST['costo_tot_forn_prev']);
@@ -93,6 +93,19 @@ if (isset($_POST['update'])) {
         } else {
             $errorMessages = "Errore nell'aggiornamento: " . mysqli_error($mysqli);
         }
+    }
+}
+// Handle restore of archived commessa
+if (isset($_GET['restore_id'])) {
+    $idcommessa = (int) $_GET['restore_id'];
+    $restoreQuery = "UPDATE commesse SET stato = 'Attiva' WHERE idcommessa = $idcommessa";
+    $result = mysqli_query($mysqli, $restoreQuery);
+
+    if ($result) {
+        header("Location: commesse.php?msg=restore_success");
+        exit();
+    } else {
+        $errorMessages = "Errore nel ripristino: " . mysqli_error($mysqli);
     }
 }
 
@@ -442,7 +455,7 @@ if (!$result) {
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="descrizione_lavoro" class="form-label">Descrizione Lavoro</label>
+                            <label for="deslavoro" class="form-label">Descrizione Lavoro</label>
                             <textarea name="deslavoro" class="form-control" id="deslavoro"></textarea>
                         </div>
 						<div class="mb-3">
@@ -494,6 +507,7 @@ if (!$result) {
                                 <th>Cliente</th>
                                 <th>Descrizione Lavoro</th>
                                 <th>Data Chiusura</th>
+								<th>Costo Totale Previsto</th>
                                 <th>Azioni</th>
                             </tr>
                         </thead>
@@ -504,16 +518,23 @@ if (!$result) {
                                     <td><?php echo htmlspecialchars($archiviateRow['cliente']); ?></td>
                                     <td><?php echo htmlspecialchars($archiviateRow['deslavoro']); ?></td>
                                     <td><?php echo htmlspecialchars($archiviateRow['datachiusura']); ?></td>
+									<td>
+										<?php 
+										echo '€ ' . (floor($archiviateRow['costo_tot_comm_prev']) == $archiviateRow['costo_tot_comm_prev'] 
+													? number_format($archiviateRow['costo_tot_comm_prev'], 0, ',', '.') 
+													: number_format($archiviateRow['costo_tot_comm_prev'], 2, ',', '.')); 
+										?>
+									</td>
                                     <td class="action-column">
-                                        <!-- Pulsante per modificare lo stato -->
-                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $archiviateRow['idcommessa']; ?>">
-                                            <i class="fas fa-edit"></i> Modifica Stato
-                                        </button>
-                                        <!-- Pulsante per eliminare -->
-                                        <a href="commesse.php?delete_id=<?php echo $archiviateRow['idcommessa']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Sei sicuro di voler eliminare questa commessa archiviata?');">
-                                            <i class="fas fa-trash-alt"></i> Elimina
-                                        </a>
-                                    </td>
+										<!-- Pulsante per ripristinare lo stato della commessa a "Attiva" -->
+										<a href="commesse.php?restore_id=<?php echo $archiviateRow['idcommessa']; ?>" class="btn btn-success btn-sm" onclick="return confirm('Sei sicuro di voler ripristinare questa commessa archiviata?');">
+											<i class="fas fa-undo"></i> 
+										</a>
+										<!-- Pulsante per eliminare la commessa -->
+										<a href="commesse.php?delete_id=<?php echo $archiviateRow['idcommessa']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Sei sicuro di voler eliminare questa commessa archiviata?');">
+											<i class="fas fa-trash-alt"></i> 
+										</a>
+									</td>
                                 </tr>
 
                                 <!-- Include il modale di modifica stato per la commessa archiviata -->
@@ -521,6 +542,13 @@ if (!$result) {
                             <?php } ?>
                         </tbody>
                     </table>
+				<!-- Display success messages -->
+				<?php if (isset($_GET['msg']) && $_GET['msg'] == 'restore_success'): ?>
+					<div class="alert alert-success text-center" role="alert">
+						Commessa ripristinata con successo.
+					</div>
+				<?php endif; ?>
+
                 <?php } else { ?>
                     <p class="text-center">Non ci sono commesse archiviate al momento.</p>
                 <?php } ?>
@@ -627,6 +655,16 @@ function sortTable(columnIndex, thElement) {
                 numeroSelectAllOption.selected = false; // Deseleziona "Seleziona tutto" per il prossimo click
             }
         });
+        const statoSelect = document.getElementById('statoSelect');
+        const statoSelectAllOption = statoSelect.querySelector('[data-select-all]');
+        statoSelect.addEventListener('change', function () {
+            if (statoSelectAllOption.selected) {
+                for (let i = 0; i < statoSelect.options.length; i++) {
+                    statoSelect.options[i].selected = true;
+                }
+                statoSelectAllOption.selected = false; // Deseleziona "Seleziona tutto" per il prossimo click
+            }
+        });
 
         const clienteSelect = document.getElementById('clienteSelect');
         const clienteSelectAllOption = clienteSelect.querySelector('[data-select-all]');
@@ -713,18 +751,6 @@ function sortTable(columnIndex, thElement) {
         // Salva il PDF con il nome che include i filtri
         doc.save(filename);
     }
-
-</script>
-
-<!-- Aggiungi il seguente script per gestire i modali sovrapposti -->
-<script>
-$('#archiviateModal').on('hidden.bs.modal', function () {
-    if ($('.modal:visible').length) { 
-        $('body').addClass('modal-open');
-    } else {
-        $('body').removeClass('modal-open');
-    }
-});
 
 </script>
 </body>

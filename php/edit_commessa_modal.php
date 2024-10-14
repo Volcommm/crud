@@ -1,27 +1,27 @@
-<!-- Edit Modal for archived commesse -->
+<!-- Modal for confirming restore or delete -->
 <div class="modal fade" id="editModal<?php echo $archiviateRow['idcommessa']; ?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $archiviateRow['idcommessa']; ?>" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel<?php echo $archiviateRow['idcommessa']; ?>">Modifica Stato Commessa</h5>
+                <h5 class="modal-title" id="editModalLabel<?php echo $archiviateRow['idcommessa']; ?>">Azioni per Commessa Archiviata</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="commesse.php" method="POST">
-                    <input type="hidden" name="id" value="<?php echo $archiviateRow['idcommessa']; ?>">
-                    <div class="mb-3">
-                        <label for="stato" class="form-label">Stato</label>
-                        <select name="stato" class="form-select" id="stato" required>
-                            <option value="Aperta" <?php if ($archiviateRow['stato'] == 'Aperta') echo 'selected'; ?>>Aperta</option>
-                            <option value="Chiusa" <?php if ($archiviateRow['stato'] == 'Chiusa') echo 'selected'; ?>>Chiusa</option>
-                            <option value="Archiviata" <?php if ($archiviateRow['stato'] == 'Archiviata') echo 'selected'; ?>>Archiviata</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $archiviateRow['idcommessa']; ?>">
-						<i class="fas fa-edit"></i> Modifica Stato
-					</button>
-
-                </form>
+                <p>Sei sicuro di voler ripristinare o eliminare questa commessa archiviata?</p>
+                <p><strong>Numero Commessa:</strong> <?php echo htmlspecialchars($archiviateRow['numero']); ?></p>
+                <p><strong>Cliente:</strong> <?php echo htmlspecialchars($archiviateRow['cliente']); ?></p>
+                <p><strong>Descrizione Lavoro:</strong> <?php echo htmlspecialchars($archiviateRow['deslavoro']); ?></p>
+                <p><strong>Data Chiusura:</strong> <?php echo htmlspecialchars($archiviateRow['datachiusura']); ?></p>
+            </div>
+            <div class="modal-footer">
+                <!-- Pulsante per ripristinare la commessa -->
+                <a href="commesse.php?restore_id=<?php echo $archiviateRow['idcommessa']; ?>" class="btn btn-success" onclick="return confirm('Sei sicuro di voler ripristinare questa commessa archiviata?');">
+                    <i class="fas fa-undo"></i> Ripristina
+                </a>
+                <!-- Pulsante per eliminare la commessa -->
+                <a href="commesse.php?delete_id=<?php echo $archiviateRow['idcommessa']; ?>" class="btn btn-danger" onclick="return confirm('Sei sicuro di voler eliminare definitivamente questa commessa archiviata?');">
+                    <i class="fas fa-trash-alt"></i> Elimina
+                </a>
             </div>
         </div>
     </div>
