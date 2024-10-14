@@ -42,6 +42,15 @@ VALUES
 ('Headphones', 15, 49.99, 3),
 ('Monitor', 8, 199.99, 4);
 
+
+----------------- tabella tipologieriferimenti
+CREATE TABLE `tipologieriferimenti` (
+  `idtipologia_rif` int(11) NOT NULL AUTO_INCREMENT,
+  `descr_rif` varchar(100) NOT NULL,
+  PRIMARY KEY (`idtipologia_rif`)
+)ENGINE=InnoDB;
+
+
 -- --------------------------------------------------------
 
 --
@@ -278,7 +287,9 @@ INSERT INTO `commesse` (`idcommessa`, `idcliente`, `numero`, `rifoff`, `stato`, 
 CREATE TABLE `comm_fornitore` (
   `idcomm_fornitore` int(11) NOT NULL,
   `idfornitore` int(11) DEFAULT NULL,
+  `idtipologia_rif` int(11) DEFAULT NULL,
   `rif` varchar(255) DEFAULT NULL,
+  `FileAllegatoRiferimento` varchar(255) DEFAULT NULL,
   `datains` date DEFAULT NULL,
   `importo` double DEFAULT NULL,
   `idcommessa` int(11) DEFAULT NULL
