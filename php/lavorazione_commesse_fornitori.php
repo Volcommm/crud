@@ -304,6 +304,7 @@ if (!empty($_GET['idcommessa'])) {
                 <th onclick="sortTable(2, this)">Fornitore <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
                 <th onclick="sortTable(3, this)">Importo <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
                 <th onclick="sortTable(4, this)">Riferimento <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+				<th onclick="sortTable(5, this)">Codice Riferimento <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
                 <th class="action-column">Azione</th>
             </tr>
         </thead>
@@ -313,7 +314,14 @@ if (!empty($_GET['idcommessa'])) {
         <td><?php echo htmlspecialchars($row['datai']); ?></td>
         <td><?php echo htmlspecialchars($row['commessa']); ?></td>
         <td><?php echo htmlspecialchars($row['fornitore']); ?></td>
-        <td><?php echo htmlspecialchars($row['importo']); ?></td>
+        <td>
+			<?php 
+			echo '€ ' . (floor($row['importo']) == $row['importo'] 
+				? number_format($row['importo'], 0, ',', '.') 
+				: number_format($row['importo'], 2, ',', '.')); 
+			?>
+		</td>
+		<td><?php echo htmlspecialchars($row['rif']); ?></td>
         <td><?php echo htmlspecialchars($row['rif']); ?></td>
         <td>
             <div class="d-flex justify-content-end">

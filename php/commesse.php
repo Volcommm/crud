@@ -282,7 +282,7 @@ if (!$result) {
 			<th onclick="sortTable(8, this)">Costo Fornitori Previsto <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
 			<th onclick="sortTable(9, this)">Costo Personale Previsto <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
 			<th onclick="sortTable(10, this)">Data Chiusura <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-			<th>Azione</th>
+			<th class="action-column">Azione</th>
 		    </tr>
 		</thead>
 

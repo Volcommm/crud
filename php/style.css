@@ -128,22 +128,7 @@ h1.text-center.display-4::before, h1.text-center.display-4::after {
     background-color: #007bff;
     color: #fff;
 }
-/* Definisci una larghezza fissa più piccola per la colonna Azione */
-#gestione-commessepersonale .action-column {
-    width: 80px !important; /* Imposta una larghezza fissa più piccola */
-    text-align: left;
-}
 
-#gestione-commessepersonale .action-column .btn {
-    margin-right: 5px;
-    padding: 4px 8px !important; /* Riduci il padding dei pulsanti */
-    font-size: 12px !important; /* Riduci leggermente la dimensione del font */
-}
-
-/* Distribuisce uniformemente le colonne dei filtri */
-#gestione-commessepersonale .row > .col-md-4 {
-	flex: 1;
-}
 /* Modale compatto */
 .modal-content {
     background-color: #ffffff;
@@ -183,6 +168,13 @@ h1.text-center.display-4::before, h1.text-center.display-4::after {
 #gestione-personale .row > .col-md-4 {
 	flex: 1;
 }
+#gestione-commesse .row > .col-md-4 {
+	flex: 1;
+}
+/* Distribuisce uniformemente le colonne dei filtri */
+#gestione-fornitore .row > .col-md-4 {
+	flex: 1;
+}
 /* Stile compatto per la barra di navigazione */
 .d-flex .btn {
     margin-right: 8px;
@@ -192,12 +184,32 @@ h1.text-center.display-4::before, h1.text-center.display-4::after {
 }
 
 /* Definisci una larghezza fissa per la colonna Azione */
+#gestione-fornitore .action-column {
+    width: 80px; /* Imposta una larghezza fissa */
+    text-align: center; /* Allinea il contenuto a destra */
+}
+
+#gestione-fornitore .action-column .btn {
+    margin-right: 5px;
+}
+
+/* Definisci una larghezza fissa per la colonna Azione */
 #gestione-personale .action-column {
-    width: 150px; /* Imposta una larghezza fissa */
-    text-align: left; /* Allinea il contenuto a destra */
+    width: 80px; /* Imposta una larghezza fissa */
+    text-align: center; /* Allinea il contenuto a destra */
 }
 
 #gestione-personale .action-column .btn {
+    margin-right: 5px;
+}
+
+/* Definisci una larghezza fissa per la colonna Azione */
+#gestione-commesse .action-column {
+    width: 80px; /* Imposta una larghezza fissa */
+    text-align: center; /* Allinea il contenuto a destra */
+}
+
+#gestione-commesse .action-column .btn {
     margin-right: 5px;
 }
 

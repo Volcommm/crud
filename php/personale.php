@@ -197,7 +197,7 @@ if (!$result) {
 		    <tr>
 			<th onclick="sortTable(0, this)">Nome <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
 			<th onclick="sortTable(1, this)">Tipologia <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-			<th>Azione</th>
+			<th class="action-column">Azione</th>
 		    </tr>
 	    </thead>
 
