@@ -308,11 +308,11 @@ $totalPages = ceil($totalRows / $limit);
     <table class="table table-hover table-bordered">
         <thead>
             <tr>
-                <th>Data Inserimento</th>
-                <th>Commessa</th>
-                <th>Fornitore</th>
-                <th>Importo</th>
-                <th>Riferimento</th>
+                <th onclick="sortTable(0, this)">Data Inserimento <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                <th onclick="sortTable(1, this)">Commessa <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                <th onclick="sortTable(2, this)">Fornitore <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                <th onclick="sortTable(3, this)">Importo <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                <th onclick="sortTable(4, this)">Riferimento <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
                 <th>Azione</th>
             </tr>
         </thead>
@@ -541,6 +541,46 @@ $totalPages = ceil($totalRows / $limit);
             handleFormSubmit(event, filterForm);
         });
     });
+</script>
+<script>
+let sortDirection = {};
+
+function sortTable(columnIndex, thElement) {
+    let table = thElement.closest('table');
+    let rows = Array.from(table.querySelectorAll('tbody tr'));
+    let isAscending = sortDirection[columnIndex] !== 'asc'; // Se già ascendente, sarà discendente, altrimenti ascendente
+    
+    rows.sort((rowA, rowB) => {
+        let cellA = rowA.cells[columnIndex].innerText.trim();
+        let cellB = rowB.cells[columnIndex].innerText.trim();
+
+        // Gestione delle colonne in valuta (Offerta in Uscita, Costo Totale Previsto, ecc.)
+        if (columnIndex === 6 || columnIndex >= 7 && columnIndex <= 10) {
+            let numA = parseFloat(cellA.replace(/[^0-9.-]+/g,"")); // Rimuovi simboli non numerici
+            let numB = parseFloat(cellB.replace(/[^0-9.-]+/g,""));
+            return isAscending ? numA - numB : numB - numA;
+        }
+        // Gestione per testo (Cliente, Descrizione Lavoro, ecc.)
+        else {
+            return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+        }
+    });
+
+    // Aggiorna la tabella
+    let tbody = table.querySelector('tbody');
+    rows.forEach(row => tbody.appendChild(row));
+
+    // Aggiorna l'icona
+    table.querySelectorAll('th .sort-icon').forEach(icon => {
+        icon.innerHTML = '<i class="fas fa-sort"></i>'; // Resetta tutte le icone
+    });
+    thElement.querySelector('.sort-icon').innerHTML = isAscending ? '<i class="fas fa-sort-up"></i>' : '<i class="fas fa-sort-down"></i>';
+
+    // Memorizza la direzione attuale per questa colonna
+    sortDirection[columnIndex] = isAscending ? 'asc' : 'desc';
+}
+
+
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
