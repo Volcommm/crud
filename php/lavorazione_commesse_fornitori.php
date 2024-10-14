@@ -93,18 +93,14 @@ $fornitoreResult = mysqli_query($mysqli, $fornitoreQuery);
 $commessaQuery = "SELECT DISTINCT c.idcommessa, c.numero FROM commesse c";
 $commessaResult = mysqli_query($mysqli, $commessaQuery);
 
-// Numero di righe per pagina
-$limit = 30;
 
-// Recupera il numero della pagina attuale, impostando la pagina 1 come predefinita
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
-$offset = ($page - 1) * $limit; // Calcola l'offset per la query
 
 // Construct the query with JOIN to fetch commesse, fornitori, and related data
-$query = "SELECT cf.*, c.numero AS commessa, f.fornitore, DATE_FORMAT(cf.datains, '%d/%m/%Y') as datai 
+$query = "SELECT cf.idcomm_fornitore, c.numero AS commessa, f.fornitore, DATE_FORMAT(cf.datains, '%d/%m/%Y') as datai, cf.importo, cf.rif 
           FROM comm_fornitore cf
           LEFT JOIN commesse c ON cf.idcommessa = c.idcommessa
           LEFT JOIN fornitori f ON cf.idfornitore = f.idfornitore";
+
 
 // Add search filter if provided
 if (!empty($_GET['search'])) {
@@ -129,7 +125,7 @@ if (!empty($_GET['idcommessa'])) {
 }
 
 // Aggiungi il limite di righe e l'offset per la paginazione
-$query .= " ORDER BY cf.idcomm_fornitore DESC LIMIT $limit OFFSET $offset";
+$query .= " ORDER BY cf.idcomm_fornitore DESC";
 
 // Esegui la query
 $result = mysqli_query($mysqli, $query);
@@ -155,12 +151,7 @@ if (!empty($_GET['idcommessa'])) {
     $totalQuery .= !empty($_GET['search']) || !empty($_GET['fornitore']) ? " AND cf.idcommessa IN ($commessaFilter)" : " WHERE cf.idcommessa IN ($commessaFilter)";
 }
 
-$totalResult = mysqli_query($mysqli, $totalQuery);
-$totalRow = mysqli_fetch_assoc($totalResult);
-$totalRows = $totalRow['total'];
 
-// Calcola il numero di pagine
-$totalPages = ceil($totalRows / $limit);
 ?>
 
 
@@ -169,7 +160,7 @@ $totalPages = ceil($totalRows / $limit);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestione Commesse</title>
+    <title>Lavorazione Commesse Fornitori</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -313,139 +304,37 @@ $totalPages = ceil($totalRows / $limit);
                 <th onclick="sortTable(2, this)">Fornitore <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
                 <th onclick="sortTable(3, this)">Importo <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
                 <th onclick="sortTable(4, this)">Riferimento <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                <th>Azione</th>
+                <th class="action-column">Azione</th>
             </tr>
         </thead>
         <tbody>
-			<?php while ($row = mysqli_fetch_assoc($result)) { ?>
-				<tr>
-					<td><?php echo htmlspecialchars($row['datai']); ?></td>
-					<td><?php echo htmlspecialchars($row['commessa']); ?></td>
-					<td><?php echo htmlspecialchars($row['fornitore']); ?></td>
-					<td><?php echo htmlspecialchars($row['importo']); ?></td>
-					<td><?php echo htmlspecialchars($row['rif']); ?></td>
-					<td>
-						<div class="d-flex justify-content-end">
-							<!-- Bottone per aprire il modal di modifica -->
-							<button class="btn btn-edit btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $row['idcomm_fornitore']; ?>">
-								<i class="fas fa-edit"></i>
-							</button>
-							<a href="lavorazione_commesse_fornitori.php?delete_id=<?php echo $row['idcomm_fornitore']; ?>" class="btn btn-delete btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questa commessa?');">
-								<i class="fas fa-trash-alt"></i>
-							</a>
-						</div>
-					</td>
-				</tr>
-			
-				<!-- Modal di Modifica -->
-				<div class="modal fade" id="editModal<?php echo $row['idcomm_fornitore']; ?>" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title" id="editModalLabel">Modifica Commessa-Fornitore</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-							</div>
-							<div class="modal-body">
-								<form action="lavorazione_commesse_fornitori.php" method="POST">
-									<input type="hidden" name="id" value="<?php echo $row['idcomm_fornitore']; ?>">
-									<!-- Data Inserimento (Insert Date) -->
-									<div class="mb-3">
-										<label for="datains" class="form-label">Data Inserimento</label>
-										<input type="date" name="datains" class="form-control" value="<?php echo htmlspecialchars($row['datains']); ?>" required>
-									</div>
-									<!-- Commessa -->
-									<div class="mb-3">
-										<label for="idcommessa" class="form-label">Commessa</label>
-										<select name="idcommessa" class="form-select" required>
-											<option value="">Seleziona una commessa</option> <!-- Opzione di default -->
-											<?php 
-											$commessaResultEdit = mysqli_query($mysqli, $commessaQuery); 
-											while ($commessaRow = mysqli_fetch_assoc($commessaResultEdit)) { ?>
-												<option value="<?php echo htmlspecialchars($commessaRow['idcommessa']); ?>" <?php if($row['idcommessa'] == $commessaRow['idcommessa']) echo 'selected'; ?>>
-													<?php echo htmlspecialchars($commessaRow['numero']); ?>
-												</option>
-											<?php } ?>
-										</select>
-									</div>
-									<!-- Fornitore -->
-									<div class="mb-3">
-										<label for="idfornitore" class="form-label">Fornitore</label>
-										<select name="idfornitore" class="form-select" required>
-											<option value="">Seleziona un fornitore</option> <!-- Opzione di default -->
-											<?php 
-											$fornitoreResultEdit = mysqli_query($mysqli, $fornitoreQuery); 
-											while ($fornitoreRow = mysqli_fetch_assoc($fornitoreResultEdit)) { ?>
-												<option value="<?php echo htmlspecialchars($fornitoreRow['idfornitore']); ?>" <?php if($row['idfornitore'] == $fornitoreRow['idfornitore']) echo 'selected'; ?>>
-													<?php echo htmlspecialchars($fornitoreRow['fornitore']); ?>
-												</option>
-											<?php } ?>
-										</select>
-									</div>
-									<!-- Importo -->
-									<div class="mb-3">
-										<label for="importo" class="form-label">Importo</label>
-										<input type="number" step="0.01" name="importo" class="form-control" value="<?php echo htmlspecialchars($row['importo']); ?>" required>
-									</div>
-									<!-- Riferimento -->
-									<div class="mb-3">
-										<label for="rif" class="form-label">Riferimento</label>
-										<input type="text" name="rif" class="form-control" value="<?php echo htmlspecialchars($row['rif']); ?>" required>
-									</div>
-									<button type="submit" name="update" class="btn btn-primary">Modifica</button>
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-			<?php } ?>
-        </tbody>
-    </table>
-</div>
-<nav aria-label="Navigazione Pagine">
-    <ul class="pagination justify-content-center">
-        <!-- Link alla pagina precedente -->
-        <?php if ($page > 1): ?>
-            <li class="page-item">
-                <a class="page-link" href="lavorazione_commesse_fornitori.php?page=<?php echo $page - 1; ?>" aria-label="Precedente">
-                    <span aria-hidden="true">&laquo;</span>
+<?php while ($row = mysqli_fetch_assoc($result)) { ?>
+    <tr>
+        <td><?php echo htmlspecialchars($row['datai']); ?></td>
+        <td><?php echo htmlspecialchars($row['commessa']); ?></td>
+        <td><?php echo htmlspecialchars($row['fornitore']); ?></td>
+        <td><?php echo htmlspecialchars($row['importo']); ?></td>
+        <td><?php echo htmlspecialchars($row['rif']); ?></td>
+        <td>
+            <div class="d-flex justify-content-end">
+                <!-- Bottone per aprire il modal di modifica -->
+		<button class="btn btn-edit btn-warning ms-2" data-id="<?php echo $row['idcomm_fornitore']; ?>" data-bs-toggle="modal" data-bs-target="#editModal">
+			<i class="fas fa-edit"></i>
+		</button>
+                <a href="lavorazione_commesse_fornitori.php?delete_id=<?php echo $row['idcomm_fornitore']; ?>" class="btn btn-delete btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questa commessa?');">
+                    <i class="fas fa-trash-alt"></i>
                 </a>
-            </li>
-        <?php endif; ?>
+            </div>
+        </td>
+    </tr>
 
-        <!-- Mostra solo le pagine all'interno di un intervallo -->
-        <?php
-        $totalPagesToShow = 10; // Mostra solo 5 pagine alla volta
-        $startPage = max(1, $page - floor($totalPagesToShow / 2));
-        $endPage = min($totalPages, $startPage + $totalPagesToShow - 1);
+<div id="modalContainer"></div>
 
-        if ($startPage > 1): ?>
-            <li class="page-item">
-                <span class="page-link">...</span>
-            </li>
-        <?php endif; ?>
 
-        <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
-            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                <a class="page-link" href="lavorazione_commesse_fornitori.php?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-            </li>
-        <?php endfor; ?>
 
-        <?php if ($endPage < $totalPages): ?>
-            <li class="page-item">
-                <span class="page-link">...</span>
-            </li>
-        <?php endif; ?>
+<?php } ?>
 
-        <!-- Link alla pagina successiva -->
-        <?php if ($page < $totalPages): ?>
-            <li class="page-item">
-                <a class="page-link" href="lavorazione_commesse_fornitori.php?page=<?php echo $page + 1; ?>" aria-label="Successiva">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        <?php endif; ?>
-    </ul>
-</nav>
+
 
 
 <!-- Bootstrap JS -->
@@ -454,6 +343,49 @@ $totalPages = ceil($totalRows / $limit);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Usa event delegation per gestire tutti i pulsanti con classe "btn-edit"
+    document.querySelector('body').addEventListener('click', function(event) {
+        if (event.target.classList.contains('btn-edit')) {
+            const id = event.target.getAttribute('data-id'); // Recupera l'id comm_fornitore
+
+            // Svuota il contenuto precedente del modale solo se è aperto
+            const modalContainer = document.getElementById('modalContainer');
+            
+            // Chiudi eventuali modali aperti prima di mostrarne uno nuovo
+            var existingModal = document.getElementById('editModal');
+            if (existingModal) {
+                var modalInstance = bootstrap.Modal.getInstance(existingModal);
+                if (modalInstance) {
+                    modalInstance.hide(); // Chiude il modale precedente se aperto
+                }
+                modalContainer.innerHTML = ''; // Svuota il contenuto del modale precedente
+            }
+
+            // Effettua la richiesta AJAX per ottenere il contenuto del modale
+            fetch('fetch_commessa_fornitore_modal.php?id=' + id + '&nocache=' + new Date().getTime())
+                .then(response => response.text())
+                .then(html => {
+                    // Inserisce il nuovo contenuto del modale
+                    modalContainer.innerHTML = html;
+
+                    // Inizializza e mostra il nuovo modale
+                    var modal = new bootstrap.Modal(document.getElementById('editModal'));
+                    modal.show();
+
+                    // Aggiungi un event listener per svuotare il contenuto alla chiusura del modale
+                    document.getElementById('editModal').addEventListener('hidden.bs.modal', function () {
+                        modalContainer.innerHTML = ''; // Svuota il contenuto del modale alla chiusura
+                    });
+                })
+                .catch(error => {
+                    console.error('Errore durante il caricamento del modale:', error);
+                });
+        }
+    });
+});
+</script>
 <script>
     function exportToExcel(queryString) {
         // Ottieni la tabella attualmente visibile
