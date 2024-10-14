@@ -251,3 +251,113 @@ h1.text-center.display-4::before, h1.text-center.display-4::after {
     width: 20%; /* Imposta la larghezza del pulsante */
 }
 
+/* Riduci la dimensione della barra di paginazione */
+#gestione-personale .pagination {
+    display: flex;
+    justify-content: center;
+    padding-left: 0;
+    list-style: none;
+    border-radius: 0.25rem;
+    margin-top: 20px;
+    flex-wrap: wrap; /* Fa sì che la paginazione si adatti alla larghezza della pagina */
+    overflow-x: auto; /* Aggiunge lo scroll orizzontale se necessario */
+    max-width: 100%; /* Si adatta alla larghezza del contenitore */
+}
+
+#gestione-personale .page-item .page-link {
+    position: relative;
+    display: block;
+    padding: 8px 16px; /* Riduci il padding per rendere i bottoni più piccoli */
+    margin-left: 5px; /* Aggiungi un piccolo margine tra i bottoni */
+    line-height: 1.25;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 20px; /* Mantieni il raggio per i bordi arrotondati */
+    font-size: 13px; /* Font più piccolo e compatto */
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#gestione-personale .page-item .page-link:hover {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+#gestione-personale .page-item.active .page-link {
+    z-index: 1;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    cursor: default;
+    border-radius: 20px;
+}
+
+#gestione-personale .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+#gestione-personale .page-item:first-child .page-link {
+    margin-left: 0;
+}
+
+#gestione-personale .page-item:last-child .page-link {
+    margin-right: 0;
+}
+
+
+/* Stile compatto per la barra di navigazione */
+#gestione-personale .navbar {
+    background-color: #007bff; /* Colore di sfondo coerente con i pulsanti */
+    padding: 10px 20px; /* Compatta la barra */
+    border-radius: 20px; /* Bordi arrotondati */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Leggera ombra per la barra */
+}
+
+#gestione-personale .navbar-brand {
+    color: #fff; /* Colore del brand in bianco */
+    font-size: 16px; /* Font leggermente più grande per il brand */
+    text-transform: uppercase; /* Maiuscolo per il titolo */
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+#gestione-personale .navbar-brand:hover {
+    color: #f1f3f5; /* Colore più chiaro al passaggio del mouse */
+}
+
+#gestione-personale .navbar-nav .nav-link {
+    color: #fff; /* Link in bianco */
+    font-size: 14px; /* Dimensione del font leggermente più piccola */
+    padding: 8px 16px; /* Riduci il padding */
+    border-radius: 20px; /* Bordi arrotondati per i link */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#gestione-personale .navbar-nav .nav-link:hover {
+    background-color: #0056b3; /* Colore di sfondo più scuro al passaggio del mouse */
+    color: #fff;
+}
+
+#gestione-personale .navbar-nav .nav-item.active .nav-link {
+    background-color: #e74c3c; /* Colore di sfondo per l'elemento attivo */
+    color: #fff;
+    font-weight: bold;
+}
+
+#gestione-personale .navbar-toggler {
+    background-color: #fff; /* Colore bianco per il toggler */
+    border: none;
+    border-radius: 20px;
+}
+
+#gestione-personale .navbar-toggler-icon {
+    background-color: #007bff; /* Colore del toggler */
+}
+
