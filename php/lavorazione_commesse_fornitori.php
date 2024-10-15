@@ -23,7 +23,6 @@ if (isset($_GET['delete_id'])) {
         $errorMessages = "Errore nella cancellazione: " . mysqli_error($mysqli);
     }
 }
-// Handle addition of new comm_fornitore
 if (isset($_POST['add'])) {
     // Sanifica e recupera i dati dal form
     $datains = mysqli_real_escape_string($mysqli, $_POST['datains']);
@@ -31,34 +30,66 @@ if (isset($_POST['add'])) {
     $idfornitore = (int) $_POST['idfornitore']; // Assicurati che sia un numero intero
     $importo = mysqli_real_escape_string($mysqli, $_POST['importo']);
     $rif = mysqli_real_escape_string($mysqli, $_POST['rif']);
+    $idtipologia_rif = (int) $_POST['idtipologia_rif'];
+    $fileAllegato = null;
 
-    // Verifica se l'ID del fornitore è valido
-    if ($idfornitore == 0) {
-        echo "Errore: Fornitore non valido o non selezionato.";
-        exit();
+    // Verifica se è stato caricato un file
+    if (!empty($_FILES['FileAllegatoRiferimento']['name'])) {
+        $fileType = $_FILES['FileAllegatoRiferimento']['type'];
+        $allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+
+        if (in_array($fileType, $allowedTypes) && $_FILES['FileAllegatoRiferimento']['size'] <= 1048576) { // Limite di 1MB
+            $fileAllegato = file_get_contents($_FILES['FileAllegatoRiferimento']['tmp_name']);
+        } else {
+            echo "Errore: Tipo di file non supportato o file troppo grande.";
+            exit();
+        }
     }
 
     // Costruzione della query SQL per l'inserimento
-    $addQuery = "INSERT INTO comm_fornitore (datains, idcommessa, idfornitore, importo, rif) 
-                 VALUES ('$datains', '$idcommessa', '$idfornitore', '$importo', '$rif')";
+    $addQuery = "INSERT INTO comm_fornitore (datains, idcommessa, idfornitore, importo, rif, idtipologia_rif";
+
+    // Aggiungi il campo BLOB se è stato caricato un file
+    if ($fileAllegato !== null) {
+        $addQuery .= ", fileallegatoriferimento";
+    }
+
+    $addQuery .= ") VALUES (?, ?, ?, ?, ?, ?";
+
+    // Aggiungi il valore del file BLOB
+    if ($fileAllegato !== null) {
+        $addQuery .= ", ?";
+    }
+
+    $addQuery .= ")";
+
+    // Prepara la query
+    $stmt = $mysqli->prepare($addQuery);
+
+    // Verifica se la query è stata preparata correttamente
+    if ($stmt === false) {
+        die("Errore nella preparazione della query: " . $mysqli->error);
+    }
+
+    // Se è stato caricato il file, usa "send_long_data" per caricare il BLOB
+    if ($fileAllegato !== null) {
+        $stmt->bind_param("siisssb", $datains, $idcommessa, $idfornitore, $importo, $rif, $idtipologia_rif, $fileAllegato);
+        $stmt->send_long_data(6, $fileAllegato); // Carica il file BLOB
+    } else {
+        $stmt->bind_param("siisss", $datains, $idcommessa, $idfornitore, $importo, $rif, $idtipologia_rif);
+    }
 
     // Esegui la query
-    $result = mysqli_query($mysqli, $addQuery);
-
-    // Verifica se l'inserimento è avvenuto con successo
-    if ($result) {
+    if ($stmt->execute()) {
         // Reindirizza l'utente alla pagina con un messaggio di successo
         header("Location: lavorazione_commesse_fornitori.php?msg=add_success");
         exit();
     } else {
         // Mostra l'errore SQL se l'inserimento fallisce
-        echo "Errore nell'inserimento: " . mysqli_error($mysqli);
+        echo "Errore nell'inserimento: " . $stmt->error;
         exit();
     }
 }
-
-
-
 
 // Handle updating of comm_fornitore
 if (isset($_POST['update'])) {
@@ -271,20 +302,21 @@ if (!empty($_GET['idcommessa'])) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="lavorazione_commesse_fornitori.php" method="POST">
+                <form action="lavorazione_commesse_fornitori.php" method="POST" enctype="multipart/form-data">
                     <!-- Data Inserimento (Insert Date) -->
                     <div class="mb-3">
                         <label for="datains" class="form-label">Data Inserimento</label>
                         <input type="date" name="datains" class="form-control" required>
                     </div>
-                    <!-- Refetch Commessa Results -->
+
+                    <!-- Commessa -->
                     <?php
                     $commessaResult = mysqli_query($mysqli, $commessaQuery); // Refetch commessa results
                     ?>
                     <div class="mb-3">
                         <label for="idcommessa" class="form-label">Commessa</label>
                         <select name="idcommessa" class="form-select" required>
-							<option value="">Seleziona una commessa</option> <!-- Opzione di default -->
+                            <option value="">Seleziona una commessa</option>
                             <?php while ($commessaRow = mysqli_fetch_assoc($commessaResult)) { ?>
                                 <option value="<?php echo htmlspecialchars($commessaRow['idcommessa']); ?>">
                                     <?php echo htmlspecialchars($commessaRow['numero']); ?>
@@ -292,39 +324,64 @@ if (!empty($_GET['idcommessa'])) {
                             <?php } ?>
                         </select>
                     </div>
-					<!-- Refetch Fornitore Results -->
-					<?php
-					// Esegui la query per ottenere fornitori
-					$fornitoreQuery = "SELECT idfornitore, fornitore FROM fornitori";
-					$fornitoreResult = mysqli_query($mysqli, $fornitoreQuery); // Refetch fornitore results
-					?>
-					<div class="mb-3">
-						<label for="idfornitore" class="form-label">Fornitore</label>
-						<select name="idfornitore" class="form-select" required>
-							<option value="">Seleziona un fornitore</option> <!-- Opzione di default -->
-							<?php while ($fornitoreRow = mysqli_fetch_assoc($fornitoreResult)) { ?>
-								<option value="<?php echo htmlspecialchars($fornitoreRow['idfornitore']); ?>">
-									<?php echo htmlspecialchars($fornitoreRow['fornitore']); ?>
-								</option>
-							<?php } ?>
-						</select>
-					</div>					
+
+                    <!-- Fornitore -->
+                    <?php
+                    $fornitoreResult = mysqli_query($mysqli, "SELECT idfornitore, fornitore FROM fornitori");
+                    ?>
+                    <div class="mb-3">
+                        <label for="idfornitore" class="form-label">Fornitore</label>
+                        <select name="idfornitore" class="form-select" required>
+                            <option value="">Seleziona un fornitore</option>
+                            <?php while ($fornitoreRow = mysqli_fetch_assoc($fornitoreResult)) { ?>
+                                <option value="<?php echo htmlspecialchars($fornitoreRow['idfornitore']); ?>">
+                                    <?php echo htmlspecialchars($fornitoreRow['fornitore']); ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+                    </div>
+
                     <!-- Importo -->
                     <div class="mb-3">
                         <label for="importo" class="form-label">Importo</label>
                         <input type="number" step="0.01" name="importo" class="form-control" required>
                     </div>
+
+                    <!-- Tipologia di Riferimento -->
+                    <?php
+                    $idtipologia_rifResult = mysqli_query($mysqli, "SELECT idtipologia_rif, descr_rif FROM tipologieriferimenti");
+                    ?>
+                    <div class="mb-3">
+                        <label for="idtipologia_rif" class="form-label">Tipologia di Riferimento</label>
+                        <select name="idtipologia_rif" class="form-select" required>
+                            <option value="">Seleziona una tipologia</option>
+                            <?php while ($idtipologia_rifRow = mysqli_fetch_assoc($idtipologia_rifResult)) { ?>
+                                <option value="<?php echo htmlspecialchars($idtipologia_rifRow['idtipologia_rif']); ?>">
+                                    <?php echo htmlspecialchars($idtipologia_rifRow['descr_rif']); ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+                    </div>
+
                     <!-- Riferimento -->
                     <div class="mb-3">
                         <label for="rif" class="form-label">Riferimento</label>
                         <input type="text" name="rif" class="form-control" required>
                     </div>
+
+					<!-- File Allegato Riferimento -->
+                    <div class="mb-3">
+                        <label for="FileAllegatoRiferimento" class="form-label">File Allegato Riferimento</label>
+                        <input type="file" name="FileAllegatoRiferimento" class="form-control">
+                    </div>
+
                     <button type="submit" name="add" class="btn btn-primary">Aggiungi</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 
 
 	

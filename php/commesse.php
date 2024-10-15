@@ -354,7 +354,8 @@ if (!$result) {
 										<div class="mb-3">
 											<label for="stato" class="form-label">Stato</label>
 											<select name="stato" class="form-select" id="stato" required>
-												<option value="Aperta" <?php if ($row['stato'] == 'Aperta') echo 'selected'; ?>>Aperta</option>
+												<option value="">Seleziona uno stato</option> <!-- Aggiungi l'opzione di default -->
+												<option value="Aperta" <?php if ($row['stato'] == 'Aperta' OR $row['stato'] == 'aperta') echo 'selected'; ?>>Aperta</option>
 												<option value="Chiusa" <?php if ($row['stato'] == 'Chiusa') echo 'selected'; ?>>Chiusa</option>
 												<option value="Archiviata" <?php if ($row['stato'] == 'Archiviata') echo 'selected'; ?>>Archiviata</option>
 											</select>
@@ -366,6 +367,7 @@ if (!$result) {
                                         <div class="mb-3">
                                             <label for="idcliente" class="form-label">Cliente</label>
                                             <select name="idcliente" class="form-select">
+											<option value="">Seleziona un cliente</option> <!-- Aggiungi l'opzione di default -->
                                                 <?php 
                                                 $clienteQuery = "SELECT * FROM clienti";
                                                 $clienteResult = mysqli_query($mysqli, $clienteQuery);

@@ -23,12 +23,14 @@ while ($fornitoreRow = mysqli_fetch_assoc($fornitoreResult)) {
     $fornitoreOptions .= "<option value='{$fornitoreRow['idfornitore']}' $selected>{$fornitoreRow['fornitore']}</option>";
 }
 
-$idtipologia_rifOptions = ''; // Inizializza la variabile
+$idtipologia_rifOptions = "<option value=''>Seleziona un riferimento</option>"; // Aggiungi un'opzione di default
 $idtipologia_rifResult = mysqli_query($mysqli, "SELECT idtipologia_rif, descr_rif FROM tipologieriferimenti");
 while ($idtipologia_rifRow = mysqli_fetch_assoc($idtipologia_rifResult)) {
-    $selected = ($idtipologia_rifRow['idtipologia_rif'] == $data['idtipologia_rif']) ? 'selected' : ''; // Confronta con idtipologia_rif
+    // Se l'id della tipologia riferimento coincide con il valore esistente nei dati ($data['idtipologia_rif'])
+    $selected = ($idtipologia_rifRow['idtipologia_rif'] == $data['idtipologia_rif']) ? 'selected' : '';
     $idtipologia_rifOptions .= "<option value='{$idtipologia_rifRow['idtipologia_rif']}' $selected>{$idtipologia_rifRow['descr_rif']}</option>";
 }
+
 
 
 
