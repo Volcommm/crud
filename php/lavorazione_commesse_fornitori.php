@@ -346,24 +346,28 @@ if (!empty($_GET['idcommessa'])) {
 <?php while ($row = mysqli_fetch_assoc($result)) { ?>
     <tr>
         <td><?php echo htmlspecialchars($row['datai']); ?></td>
-        <td><?php echo htmlspecialchars($row['commessa']); ?></td>
-        <td><?php echo htmlspecialchars($row['fornitore']); ?></td>
-        <td>
+	    <td><?php echo htmlspecialchars($row['commessa']); ?></td>
+	    <td><?php echo htmlspecialchars($row['fornitore']); ?></td>
+	    <td>
 		<?php 
 		echo '€ ' . (floor($row['importo']) == $row['importo'] 
-			? number_format($row['importo'], 0, ',', '.') 
-			: number_format($row['importo'], 2, ',', '.')); 
+		    ? number_format($row['importo'], 0, ',', '.') 
+		    : number_format($row['importo'], 2, ',', '.')); 
 		?>
-	</td>
-	<td><?php echo htmlspecialchars($row['descr_rif']); ?></td>
-        <td><?php echo htmlspecialchars($row['rif']); ?></td>
-	<td>
-	    <?php if (!empty($row['FileAllegatoRiferimento'])): ?>
-		<a href="download_file.php?id=<?php echo $row['idcomm_fornitore']; ?>">Scarica file</a>
-	    <?php else: ?>
-		Nessun file allegato
-	    <?php endif; ?>
-	</td>
+	    </td>
+	    <td><?php echo htmlspecialchars($row['descr_rif']); ?></td>
+	    <td><?php echo htmlspecialchars($row['rif']); ?></td>
+	    <td>
+		<?php if (!empty($row['FileAllegatoRiferimento'])): ?>
+		    <?php 
+		        // Crea il nome del file
+		        $fileName = "{$row['commessa']}-{$row['descr_rif']}-{$row['rif']}"; // Cambia l'estensione se necessario
+		    ?>
+		    <a href="download_file.php?id=<?php echo $row['idcomm_fornitore']; ?>"><?php echo htmlspecialchars($fileName); ?></a>
+		<?php else: ?>
+		    Nessun file allegato
+		<?php endif; ?>
+	    </td>
         <td>
             <div class="d-flex justify-content-end">
                 <!-- Bottone per aprire il modal di modifica -->

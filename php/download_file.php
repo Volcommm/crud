@@ -23,11 +23,35 @@ if (isset($_GET['id'])) {
         $stmt->bind_result($fileAllegato, $rif, $descr_rif, $commessa);
         $stmt->fetch();
 
+        // Determina l'estensione del file (qui è un esempio, personalizzalo in base alle tue necessità)
+        $extension = 'pdf'; // Valore di default
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileAllegato);
+        
+        // Imposta l'estensione corretta in base al tipo MIME
+        switch ($mimeType) {
+            case 'application/pdf':
+                $extension = 'pdf';
+                break;
+            case 'image/jpeg':
+                $extension = 'jpg';
+                break;
+            case 'image/png':
+                $extension = 'png';
+                break;
+            // Aggiungi altri tipi MIME e relative estensioni se necessario
+            default:
+                // Se non riconosciuto, puoi decidere come gestirlo
+                // Ad esempio, mantenere l'estensione di default o generare un errore
+                $extension = 'bin'; // oppure un errore
+                break;
+        }
+
         // Costruisci il nome del file
-        $fileName = "{$commessa}-{$descr_rif}-{$rif}.pdf"; // Sostituisci .pdf con l'estensione corretta se diversa
+        $fileName = "{$commessa}-{$descr_rif}-{$rif}.$extension"; // Usa l'estensione corretta
 
         // Imposta gli header per il download
-        header('Content-Type: application/pdf'); // Cambia il tipo di contenuto se necessario
+        header('Content-Type: ' . $mimeType); // Cambia il tipo di contenuto
         header('Content-Disposition: attachment; filename="' . $fileName . '"'); // Utilizza il valore costruito per il nome del file
         header('Content-Length: ' . strlen($fileAllegato));
 
