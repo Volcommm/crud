@@ -50,6 +50,13 @@ CREATE TABLE `tipologieriferimenti` (
   PRIMARY KEY (`idtipologia_rif`)
 )ENGINE=InnoDB;
 
+INSERT INTO `tipologieriferimenti` (`idtipologia_rif`, `descr_rif`)
+VALUES 
+(1, 'DDT'),
+(2, 'NC'),
+(3, 'FATT'),
+(4, 'BOLLA');
+
 
 -- --------------------------------------------------------
 
@@ -289,7 +296,7 @@ CREATE TABLE `comm_fornitore` (
   `idfornitore` int(11) DEFAULT NULL,
   `idtipologia_rif` int(11) DEFAULT NULL,
   `rif` varchar(255) DEFAULT NULL,
-  `FileAllegatoRiferimento` varchar(255) DEFAULT NULL,
+  `FileAllegatoRiferimento` LONGBLOB DEFAULT NULL,
   `datains` date DEFAULT NULL,
   `importo` double DEFAULT NULL,
   `idcommessa` int(11) DEFAULT NULL

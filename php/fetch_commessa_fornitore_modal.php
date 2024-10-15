@@ -23,6 +23,15 @@ while ($fornitoreRow = mysqli_fetch_assoc($fornitoreResult)) {
     $fornitoreOptions .= "<option value='{$fornitoreRow['idfornitore']}' $selected>{$fornitoreRow['fornitore']}</option>";
 }
 
+$idtipologia_rifOptions = ''; // Inizializza la variabile
+$idtipologia_rifResult = mysqli_query($mysqli, "SELECT idtipologia_rif, descr_rif FROM tipologieriferimenti");
+while ($idtipologia_rifRow = mysqli_fetch_assoc($idtipologia_rifResult)) {
+    $selected = ($idtipologia_rifRow['idtipologia_rif'] == $data['idtipologia_rif']) ? 'selected' : ''; // Confronta con idtipologia_rif
+    $idtipologia_rifOptions .= "<option value='{$idtipologia_rifRow['idtipologia_rif']}' $selected>{$idtipologia_rifRow['descr_rif']}</option>";
+}
+
+
+
 // Restituisci il markup del modale
 echo "
 <div class='modal fade' id='editModal' tabindex='-1' aria-labelledby='editModalLabel' aria-hidden='true'>
@@ -33,7 +42,7 @@ echo "
                 <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
             </div>
             <div class='modal-body'>
-                <form id='editForm' action='lavorazione_commesse_fornitori.php' method='POST'>
+                <form id='editForm' action='lavorazione_commesse_fornitori.php' method='POST' enctype='multipart/form-data'>
                     <input type='hidden' name='id' id='editId' value='{$data['idcomm_fornitore']}'>
                     <div class='mb-3'>
                         <label for='editDatains' class='form-label'>Data Inserimento</label>
@@ -55,10 +64,20 @@ echo "
                         <label for='editImporto' class='form-label'>Importo</label>
                         <input type='number' step='0.01' name='importo' class='form-control' id='editImporto' value='{$data['importo']}' required>
                     </div>
+		    <div class='mb-3'>
+                        <label for='editTipoRif' class='form-label'>TipologiaRiferimento</label>
+                        <select name='idtipologia_rif' class='form-select' id='editTipoRif' required>
+                            $idtipologia_rifOptions
+                        </select>
+                    </div>
                     <div class='mb-3'>
                         <label for='editRif' class='form-label'>Riferimento</label>
                         <input type='text' name='rif' class='form-control' id='editRif' value='{$data['rif']}' required>
                     </div>
+		    <div class='mb-3'>
+			<label for='editFileAllegato' class='form-label'>File Allegato Riferimento</label>
+			<input type='file' name='FileAllegatoRiferimento' class='form-control' id='editFileAllegato'>
+		    </div>
                     <button type='submit' name='update' class='btn btn-primary'>Modifica</button>
                 </form>
             </div>

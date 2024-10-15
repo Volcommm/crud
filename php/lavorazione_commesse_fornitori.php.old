@@ -68,51 +68,21 @@ if (isset($_POST['update'])) {
     $idfornitore = (int) $_POST['idfornitore'];
     $importo = mysqli_real_escape_string($mysqli, $_POST['importo']);
     $rif = mysqli_real_escape_string($mysqli, $_POST['rif']);
-    $idtipologia_rif = (int) $_POST['idtipologia_rif'];
-    $fileAllegato = null;
 
-    if (!empty($_FILES['FileAllegatoRiferimento']['name'])) {
-        $fileType = $_FILES['FileAllegatoRiferimento']['type'];
-        $allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-
-        if (in_array($fileType, $allowedTypes) && $_FILES['FileAllegatoRiferimento']['size'] <= 1048576) { // Limite di 1MB
-            $fileAllegato = file_get_contents($_FILES['FileAllegatoRiferimento']['tmp_name']);
-        } else {
-            $errorMessages = "Tipo di file non supportato o file troppo grande.";
-        }
-    }
-
-    // Prepara la query di aggiornamento
     $updateQuery = "UPDATE comm_fornitore 
-                    SET datains = ?, idcommessa = ?, idfornitore = ?, 
-                        importo = ?, rif = ?, idtipologia_rif = ?";
+                    SET datains = '$datains', idcommessa = '$idcommessa', idfornitore = '$idfornitore', importo = '$importo', rif = '$rif'
+                    WHERE idcomm_fornitore = $idcomm_fornitore";
 
-    // Se è stato caricato un file, aggiungi il campo BLOB
-    if ($fileAllegato !== null) {
-        $updateQuery .= ", fileallegatoriferimento = ?";
-    }
+    $result = mysqli_query($mysqli, $updateQuery);
 
-    $updateQuery .= " WHERE idcomm_fornitore = ?";
-
-    // Prepara la query
-    $stmt = $mysqli->prepare($updateQuery);
-
-    // Bind dei parametri
-    if ($fileAllegato !== null) {
-        $stmt->bind_param("siissssi", $datains, $idcommessa, $idfornitore, $importo, $rif, $idtipologia_rif, $fileAllegato, $idcomm_fornitore);
-    } else {
-        $stmt->bind_param("siisssi", $datains, $idcommessa, $idfornitore, $importo, $rif, $idtipologia_rif, $idcomm_fornitore);
-    }
-
-    // Esegui la query
-    if ($stmt->execute()) {
+    if ($result) {
         header("Location: lavorazione_commesse_fornitori.php?msg=update_success");
         exit();
     } else {
-        $errorMessages = "Errore nella modifica: " . $stmt->error;
+        $errorMessages = "Errore nella modifica: " . mysqli_error($mysqli);
     }
+	
 }
-
 
 // Fetch unique names for filter (using fornitori)
 $fornitoreQuery = "SELECT DISTINCT fornitore FROM fornitori";
@@ -122,21 +92,24 @@ $fornitoreResult = mysqli_query($mysqli, $fornitoreQuery);
 $commessaQuery = "SELECT DISTINCT c.idcommessa, c.numero FROM commesse c";
 $commessaResult = mysqli_query($mysqli, $commessaQuery);
 
+// Numero di righe per pagina
+$limit = 30;
 
+// Recupera il numero della pagina attuale, impostando la pagina 1 come predefinita
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit; // Calcola l'offset per la query
 
 // Construct the query with JOIN to fetch commesse, fornitori, and related data
 $query = "SELECT cf.*, t.descr_rif, c.numero AS commessa, f.fornitore, DATE_FORMAT(cf.datains, '%d/%m/%Y') as datai 
           FROM comm_fornitore cf
           LEFT JOIN commesse c ON cf.idcommessa = c.idcommessa
           LEFT JOIN fornitori f ON cf.idfornitore = f.idfornitore
-          LEFT JOIN tipologieriferimenti t ON cf.idtipologia_rif = t.idtipologia_rif
-          where (c.stato = 'aperta' or c.stato = 'Aperta')   ";
-
+          LEFT JOIN tipologieriferimenti t ON cf.idtipologia_rif = t.idtipologia_rif where (c.stato = 'aperta' or c.stato = 'Aperta') ";
 
 // Add search filter if provided
 if (!empty($_GET['search'])) {
     $searchTerm = mysqli_real_escape_string($mysqli, $_GET['search']); // Escape the search term
-    $query .= " and (c.numero LIKE '%$searchTerm%' OR f.fornitore LIKE '%$searchTerm%')";
+    $query .= " AND (c.numero LIKE '%$searchTerm%' OR f.fornitore LIKE '%$searchTerm%')";
 }
 
 // Add filter by fornitore
@@ -145,18 +118,18 @@ if (!empty($_GET['fornitore'])) {
     $fornitoreFilter = implode("','", array_map(function($fornitore) use ($mysqli) {
         return mysqli_real_escape_string($mysqli, $fornitore); // Escape each fornitore
     }, $fornitori));
-    $query .= !empty($_GET['search']) ? " and f.fornitore IN ('$fornitoreFilter')" : " and f.fornitore IN ('$fornitoreFilter')";
+    $query .= !empty($_GET['search']) ? " AND f.fornitore IN ('$fornitoreFilter')" : " AND f.fornitore IN ('$fornitoreFilter')";
 }
 
 // Add filter by commessa
 if (!empty($_GET['idcommessa'])) {
     $commesse = $_GET['idcommessa'];
     $commessaFilter = implode(",", array_map('intval', $commesse)); // Ensure it's an integer
-    $query .= (!empty($_GET['search']) || !empty($_GET['fornitore'])) ? " AND cf.idcommessa IN ($commessaFilter)" : " and cf.idcommessa IN ($commessaFilter)";
+    $query .= (!empty($_GET['search']) || !empty($_GET['fornitore'])) ? " AND cf.idcommessa IN ($commessaFilter)" : " AND cf.idcommessa IN ($commessaFilter)";
 }
 
 // Aggiungi il limite di righe e l'offset per la paginazione
-$query .= " ORDER BY cf.idcomm_fornitore DESC";
+$query .= " ORDER BY cf.idcomm_fornitore DESC LIMIT $limit OFFSET $offset";
 
 // Esegui la query
 $result = mysqli_query($mysqli, $query);
@@ -168,23 +141,26 @@ if (!$result) {
 
 // Query per contare il numero totale di righe
 $totalQuery = "SELECT COUNT(*) as total FROM comm_fornitore cf
-          LEFT JOIN commesse c ON cf.idcommessa = c.idcommessa
-          LEFT JOIN fornitori f ON cf.idfornitore = f.idfornitore
-          LEFT JOIN tipologieriferimenti t ON cf.idtipologia_rif = t.idtipologia_rif
-          where (c.stato = 'aperta' or c.stato = 'Aperta')    ";
+               LEFT JOIN commesse c ON cf.idcommessa = c.idcommessa
+               LEFT JOIN fornitori f ON cf.idfornitore = f.idfornitore";
 
 // Aggiungi eventuali filtri di ricerca alla query del conteggio
 if (!empty($_GET['search'])) {
-    $totalQuery .= " and (c.numero LIKE '%$searchTerm%' OR f.fornitore LIKE '%$searchTerm%')";
+    $totalQuery .= " WHERE (c.numero LIKE '%$searchTerm%' OR f.fornitore LIKE '%$searchTerm%')";
 }
 if (!empty($_GET['fornitore'])) {
-    $totalQuery .= !empty($_GET['search']) ? " AND f.fornitore IN ('$fornitoreFilter')" : " and f.fornitore IN ('$fornitoreFilter')";
+    $totalQuery .= !empty($_GET['search']) ? " AND f.fornitore IN ('$fornitoreFilter')" : " WHERE f.fornitore IN ('$fornitoreFilter')";
 }
 if (!empty($_GET['idcommessa'])) {
-    $totalQuery .= !empty($_GET['search']) || !empty($_GET['fornitore']) ? " AND cf.idcommessa IN ($commessaFilter)" : " and cf.idcommessa IN ($commessaFilter)";
+    $totalQuery .= !empty($_GET['search']) || !empty($_GET['fornitore']) ? " AND cf.idcommessa IN ($commessaFilter)" : " WHERE cf.idcommessa IN ($commessaFilter)";
 }
 
+$totalResult = mysqli_query($mysqli, $totalQuery);
+$totalRow = mysqli_fetch_assoc($totalResult);
+$totalRows = $totalRow['total'];
 
+// Calcola il numero di pagine
+$totalPages = ceil($totalRows / $limit);
 ?>
 
 
@@ -193,7 +169,7 @@ if (!empty($_GET['idcommessa'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lavorazione Commesse Fornitori</title>
+    <title>Gestione Commesse</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -336,54 +312,144 @@ if (!empty($_GET['idcommessa'])) {
                 <th onclick="sortTable(1, this)">Commessa <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
                 <th onclick="sortTable(2, this)">Fornitore <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
                 <th onclick="sortTable(3, this)">Importo <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                <th onclick="sortTable(4, this)">Riferimento <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-		<th onclick="sortTable(5, this)">Codice Riferimento <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-		<th onclick="sortTable(5, this)">Riferimento Allegato<span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                <th class="action-column">Azione</th>
+		<th onclick="sortTable(4, this)">Riferimento <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+		<th onclick="sortTable(5, this)">Codice Rif <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+		<th onclick="sortTable(6, this)">Allegato <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                <th>Azione</th>
             </tr>
         </thead>
         <tbody>
-<?php while ($row = mysqli_fetch_assoc($result)) { ?>
-    <tr>
-        <td><?php echo htmlspecialchars($row['datai']); ?></td>
-        <td><?php echo htmlspecialchars($row['commessa']); ?></td>
-        <td><?php echo htmlspecialchars($row['fornitore']); ?></td>
-        <td>
-		<?php 
-		echo '€ ' . (floor($row['importo']) == $row['importo'] 
-			? number_format($row['importo'], 0, ',', '.') 
-			: number_format($row['importo'], 2, ',', '.')); 
-		?>
-	</td>
-	<td><?php echo htmlspecialchars($row['descr_rif']); ?></td>
-        <td><?php echo htmlspecialchars($row['rif']); ?></td>
-	<td>
-	    <?php if (!empty($row['FileAllegatoRiferimento'])): ?>
-		<a href="download_file.php?id=<?php echo $row['idcomm_fornitore']; ?>">Scarica file</a>
-	    <?php else: ?>
-		Nessun file allegato
-	    <?php endif; ?>
-	</td>
-        <td>
-            <div class="d-flex justify-content-end">
-                <!-- Bottone per aprire il modal di modifica -->
-		<button class="btn btn-edit btn-warning ms-2" data-id="<?php echo $row['idcomm_fornitore']; ?>" data-bs-toggle="modal" data-bs-target="#editModal">
-			<i class="fas fa-edit"></i>
-		</button>
-                <a href="lavorazione_commesse_fornitori.php?delete_id=<?php echo $row['idcomm_fornitore']; ?>" class="btn btn-delete btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questa commessa?');">
-                    <i class="fas fa-trash-alt"></i>
+			<?php while ($row = mysqli_fetch_assoc($result)) { ?>
+				<tr>
+					<td><?php echo htmlspecialchars($row['datai']); ?></td>
+					<td><?php echo htmlspecialchars($row['commessa']); ?></td>
+					<td><?php echo htmlspecialchars($row['fornitore']); ?></td>
+					<td><?php echo htmlspecialchars($row['importo']); ?></td>
+					<td><?php echo htmlspecialchars($row['descr_rif']); ?></td>
+					<td><?php echo htmlspecialchars($row['rif']); ?></td>
+					<td><?php echo htmlspecialchars($row['FileAllegatoRiferimento']); ?></td>
+					<td>
+						<div class="d-flex justify-content-end">
+							<!-- Bottone per aprire il modal di modifica -->
+							<button class="btn btn-edit btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $row['idcomm_fornitore']; ?>">
+								<i class="fas fa-edit"></i>
+							</button>
+							<a href="lavorazione_commesse_fornitori.php?delete_id=<?php echo $row['idcomm_fornitore']; ?>" class="btn btn-delete btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questa commessa?');">
+								<i class="fas fa-trash-alt"></i>
+							</a>
+						</div>
+					</td>
+				</tr>
+			
+				<!-- Modal di Modifica -->
+				<div class="modal fade" id="editModal<?php echo $row['idcomm_fornitore']; ?>" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="editModalLabel">Modifica Commessa-Fornitore</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<form action="lavorazione_commesse_fornitori.php" method="POST">
+									<input type="hidden" name="id" value="<?php echo $row['idcomm_fornitore']; ?>">
+									<!-- Data Inserimento (Insert Date) -->
+									<div class="mb-3">
+										<label for="datains" class="form-label">Data Inserimento</label>
+										<input type="date" name="datains" class="form-control" value="<?php echo htmlspecialchars($row['datains']); ?>" required>
+									</div>
+									<!-- Commessa -->
+									<div class="mb-3">
+										<label for="idcommessa" class="form-label">Commessa</label>
+										<select name="idcommessa" class="form-select" required>
+											<option value="">Seleziona una commessa</option> <!-- Opzione di default -->
+											<?php 
+											$commessaResultEdit = mysqli_query($mysqli, $commessaQuery); 
+											while ($commessaRow = mysqli_fetch_assoc($commessaResultEdit)) { ?>
+												<option value="<?php echo htmlspecialchars($commessaRow['idcommessa']); ?>" <?php if($row['idcommessa'] == $commessaRow['idcommessa']) echo 'selected'; ?>>
+													<?php echo htmlspecialchars($commessaRow['numero']); ?>
+												</option>
+											<?php } ?>
+										</select>
+									</div>
+									<!-- Fornitore -->
+									<div class="mb-3">
+										<label for="idfornitore" class="form-label">Fornitore</label>
+										<select name="idfornitore" class="form-select" required>
+											<option value="">Seleziona un fornitore</option> <!-- Opzione di default -->
+											<?php 
+											$fornitoreResultEdit = mysqli_query($mysqli, $fornitoreQuery); 
+											while ($fornitoreRow = mysqli_fetch_assoc($fornitoreResultEdit)) { ?>
+												<option value="<?php echo htmlspecialchars($fornitoreRow['idfornitore']); ?>" <?php if($row['idfornitore'] == $fornitoreRow['idfornitore']) echo 'selected'; ?>>
+													<?php echo htmlspecialchars($fornitoreRow['fornitore']); ?>
+												</option>
+											<?php } ?>
+										</select>
+									</div>
+									<!-- Importo -->
+									<div class="mb-3">
+										<label for="importo" class="form-label">Importo</label>
+										<input type="number" step="0.01" name="importo" class="form-control" value="<?php echo htmlspecialchars($row['importo']); ?>" required>
+									</div>
+									<!-- Riferimento -->
+									<div class="mb-3">
+										<label for="rif" class="form-label">Riferimento</label>
+										<input type="text" name="rif" class="form-control" value="<?php echo htmlspecialchars($row['rif']); ?>" required>
+									</div>
+									<button type="submit" name="update" class="btn btn-primary">Modifica</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			<?php } ?>
+        </tbody>
+    </table>
+</div>
+<nav aria-label="Navigazione Pagine">
+    <ul class="pagination justify-content-center">
+        <!-- Link alla pagina precedente -->
+        <?php if ($page > 1): ?>
+            <li class="page-item">
+                <a class="page-link" href="lavorazione_commesse_fornitori.php?page=<?php echo $page - 1; ?>" aria-label="Precedente">
+                    <span aria-hidden="true">&laquo;</span>
                 </a>
-            </div>
-        </td>
-    </tr>
+            </li>
+        <?php endif; ?>
 
-<div id="modalContainer"></div>
+        <!-- Mostra solo le pagine all'interno di un intervallo -->
+        <?php
+        $totalPagesToShow = 10; // Mostra solo 5 pagine alla volta
+        $startPage = max(1, $page - floor($totalPagesToShow / 2));
+        $endPage = min($totalPages, $startPage + $totalPagesToShow - 1);
 
+        if ($startPage > 1): ?>
+            <li class="page-item">
+                <span class="page-link">...</span>
+            </li>
+        <?php endif; ?>
 
+        <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
+                <a class="page-link" href="lavorazione_commesse_fornitori.php?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+            </li>
+        <?php endfor; ?>
 
-<?php } ?>
+        <?php if ($endPage < $totalPages): ?>
+            <li class="page-item">
+                <span class="page-link">...</span>
+            </li>
+        <?php endif; ?>
 
-
+        <!-- Link alla pagina successiva -->
+        <?php if ($page < $totalPages): ?>
+            <li class="page-item">
+                <a class="page-link" href="lavorazione_commesse_fornitori.php?page=<?php echo $page + 1; ?>" aria-label="Successiva">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        <?php endif; ?>
+    </ul>
+</nav>
 
 
 <!-- Bootstrap JS -->
@@ -392,49 +458,6 @@ if (!empty($_GET['idcommessa'])) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Usa event delegation per gestire tutti i pulsanti con classe "btn-edit"
-    document.querySelector('body').addEventListener('click', function(event) {
-        if (event.target.classList.contains('btn-edit')) {
-            const id = event.target.getAttribute('data-id'); // Recupera l'id comm_fornitore
-
-            // Svuota il contenuto precedente del modale solo se è aperto
-            const modalContainer = document.getElementById('modalContainer');
-            
-            // Chiudi eventuali modali aperti prima di mostrarne uno nuovo
-            var existingModal = document.getElementById('editModal');
-            if (existingModal) {
-                var modalInstance = bootstrap.Modal.getInstance(existingModal);
-                if (modalInstance) {
-                    modalInstance.hide(); // Chiude il modale precedente se aperto
-                }
-                modalContainer.innerHTML = ''; // Svuota il contenuto del modale precedente
-            }
-
-            // Effettua la richiesta AJAX per ottenere il contenuto del modale
-            fetch('fetch_commessa_fornitore_modal.php?id=' + id + '&nocache=' + new Date().getTime())
-                .then(response => response.text())
-                .then(html => {
-                    // Inserisce il nuovo contenuto del modale
-                    modalContainer.innerHTML = html;
-
-                    // Inizializza e mostra il nuovo modale
-                    var modal = new bootstrap.Modal(document.getElementById('editModal'));
-                    modal.show();
-
-                    // Aggiungi un event listener per svuotare il contenuto alla chiusura del modale
-                    document.getElementById('editModal').addEventListener('hidden.bs.modal', function () {
-                        modalContainer.innerHTML = ''; // Svuota il contenuto del modale alla chiusura
-                    });
-                })
-                .catch(error => {
-                    console.error('Errore durante il caricamento del modale:', error);
-                });
-        }
-    });
-});
-</script>
 <script>
     function exportToExcel(queryString) {
         // Ottieni la tabella attualmente visibile
@@ -535,20 +558,22 @@ function sortTable(columnIndex, thElement) {
         let cellA = rowA.cells[columnIndex].innerText.trim();
         let cellB = rowB.cells[columnIndex].innerText.trim();
 
-        // Gestione dell'ordinamento per data (colonna 0)
-        if (columnIndex === 0) {
-            let dateA = new Date(cellA.split('/').reverse().join('-')); // Converti 'DD/MM/YYYY' in 'YYYY-MM-DD'
-            let dateB = new Date(cellB.split('/').reverse().join('-'));
-            return isAscending ? dateA - dateB : dateB - dateA;
-        }
-        // Gestione delle colonne in valuta (colonna 2, 6 e da 7 a 10)
-        else if (columnIndex === 3 || columnIndex === 6 || (columnIndex >= 7 && columnIndex <= 10)) {
-            // Rimuovi simboli di valuta e separatori delle migliaia, e sostituisci la virgola con un punto decimale
-            let numA = parseFloat(cellA.replace(/[^0-9,.-]+/g, "").replace(".", "").replace(",", "."));
-            let numB = parseFloat(cellB.replace(/[^0-9,.-]+/g, "").replace(".", "").replace(",", "."));
+        // Gestione delle colonne in valuta (ad esempio, Importo)
+        if (columnIndex === 3) {
+            let numA = parseFloat(cellA.replace(/[^0-9.-]+/g, "")); // Rimuovi simboli non numerici
+            let numB = parseFloat(cellB.replace(/[^0-9.-]+/g, ""));
             return isAscending ? numA - numB : numB - numA;
         }
-        // Gestione per testo
+        // Gestione delle colonne di date (ad esempio, Data Inserimento)
+        else if (columnIndex === 0) {
+            // Conversione della data da "DD/MM/YYYY" a oggetto Date
+            let [dayA, monthA, yearA] = cellA.split('/').map(Number);
+            let [dayB, monthB, yearB] = cellB.split('/').map(Number);
+            let dateA = new Date(yearA, monthA - 1, dayA);
+            let dateB = new Date(yearB, monthB - 1, dayB);
+            return isAscending ? dateA - dateB : dateB - dateA;
+        }
+        // Gestione per testo (Commessa, Fornitore, ecc.)
         else {
             return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
         }
