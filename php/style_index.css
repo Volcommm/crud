@@ -1,0 +1,328 @@
+		/* Stile aggiornato per il titolo principale #header */
+		#header {
+			position: relative;
+			font-weight: bold;
+			color: #34495e;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			margin-bottom: 30px;
+			padding-bottom: 10px;
+			text-align: center;
+			background: none;
+			overflow: hidden;
+			font-size: 2.5rem; /* Aggiunto: dimensione del testo per renderlo più grande */
+		}
+		
+		#header::before, #header::after {
+			content: '';
+			position: absolute;
+			height: 2px;
+			width: 50%;
+			bottom: 0;
+			background-color: #2980b9;
+			transition: all 0.4s ease;
+			z-index: 1;
+		}
+		
+		#header::before {
+			left: 0;
+			background-color: #2980b9;
+		}
+		
+		#header::after {
+			right: 0;
+			background-color: #e74c3c;
+		}
+		
+		#header:hover::before, #header:hover::after {
+			width: 100%;
+			background-color: #2ecc71;
+		}
+		
+		#header::before, #header::after {
+			animation: move-bar 2s ease infinite alternate;
+		}
+		
+		@keyframes move-bar {
+			0% {
+				width: 0;
+			}
+			100% {
+				width: 100%;
+			}
+		}
+
+
+		/* Sfondo principale */
+		body {
+			background-color: #eef1f7;
+			color: #333;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			transition: background-color 0.5s ease;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+		}
+		
+		/* Contenitore principale */
+		.container {
+			margin-top: 60px;
+			padding: 40px;
+			background-color: #ffffff;
+			border-radius: 12px;
+			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+			position: relative;
+			animation: fadeIn 1s ease-out;
+		}
+		
+		/* Animazione fade-in */
+		@keyframes fadeIn {
+			from { opacity: 0; transform: translateY(20px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+		
+		/* Messaggio di benvenuto aggiornato */
+		.welcome-message {
+			font-size: 28px; /* Un po' più grande per un look più moderno */
+			font-weight: 700; /* Grassetto per maggiore enfasi */
+			color: #2c3e50; /* Un blu scuro più professionale */
+			text-align: center;
+			margin-bottom: 30px;
+			position: relative;
+			letter-spacing: 1.5px; /* Spaziatura delle lettere per un effetto raffinato */
+			transition: all 0.5s ease-in-out; /* Transizione per rendere il cambiamento più fluido */
+			text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombra leggera per profondità */
+		}
+		
+		/* Modifica: isoliamo l'effetto hover sul solo testo */
+		.welcome-message span {
+			display: inline-block;
+			transition: all 0.5s ease-in-out;
+		}
+		
+		/* Animazione al passaggio del mouse sul testo */
+		.welcome-message span:hover {
+			color: #007bff; /* Cambia colore al passaggio del mouse */
+			transform: scale(1.05); /* Leggera ingrandimento per un effetto dinamico */
+			text-shadow: 0 6px 10px rgba(0, 123, 255, 0.2); /* Aumenta l'ombra per dare più enfasi */
+		}
+		
+		/* Effetto apparizione del messaggio */
+		@keyframes fadeInWelcome {
+			0% {
+				opacity: 0;
+				transform: translateY(-20px);
+			}
+			100% {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+		
+		.welcome-message {
+			animation: fadeInWelcome 1s ease-out;
+		}
+		
+		/* Pulsante logout rimane separato e senza effetto hover */
+		.welcome-message .btn-logout {
+			font-size: 14px;
+			padding: 10px 20px;
+			background-color: #e74c3c;
+			color: white;
+			border-radius: 20px;
+			transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+			box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2);
+			position: absolute;
+			right: 20px; /* Impostiamo una distanza fissa da destra */
+			top: 50%;
+			transform: translateY(-50%); /* Per mantenere il pulsante centrato verticalmente */
+		}
+		
+		/* Pulsante logout con effetto hover */
+		.welcome-message .btn-logout:hover {
+			background-color: #c0392b;
+			box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3); /* Aggiunge un'ombra più grande */
+			transform: translateY(-50%) scale(1.05); /* Aggiunge l'effetto di ingrandimento senza spostarlo */
+		}
+
+
+		
+
+		
+		/* Contenitore per le sezioni */
+		.sections-container {
+			display: flex;
+			justify-content: space-between;
+			gap: 20px;
+			flex-wrap: wrap;
+		}
+		
+		/* Stile per ogni sezione */
+		.section {
+			flex: 1;
+			margin-bottom: 40px;
+			background-color: #f4f6f9;
+			padding: 25px;
+			border-radius: 12px;
+			position: relative;
+			overflow: hidden;
+			transition: box-shadow 0.3s ease;
+			min-width: 280px;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+		}
+		
+		.section:hover {
+			box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+		}
+		
+		/* Titoli delle sezioni */
+		.section-title {
+			font-size: 24px;
+			font-weight: 700;
+			margin-bottom: 20px;
+			color: #2980b9;
+			cursor: pointer;
+			position: relative;
+			transition: color 0.3s ease;
+		}
+		
+		
+		
+		/* Contenuto delle sezioni */
+		.section-content {
+			max-height: 0;
+			opacity: 0;
+			overflow: hidden;
+			transition: max-height 1s ease, opacity 0.5s ease;
+			margin-top: 10px;
+			padding-left: 20px;
+		}
+
+        /* Colore specifico per Gestione Dati Commesse */
+        .section:first-of-type .section-title {
+            color: #2980b9;
+        }
+		.section:first-of-type .section-title:hover {
+            color: #007bff; /* Blu più chiaro */
+        }
+
+
+        /* Colore specifico per Gestione Lavorazione Commesse */
+        .section:nth-of-type(2) .section-title {
+            color: #f39c12; /* Giallo */
+        }
+
+        .section:nth-of-type(2) .section-title:hover {
+            color: #f1c40f; /* Giallo più chiaro */
+        }
+
+        /* Colore specifico per Statistiche e Controllo Commesse */
+        .section:nth-of-type(3) .section-title {
+            color: #27ae60; /* Verde */
+        }
+
+        .section:nth-of-type(3) .section-title:hover {
+            color: #2ecc71; /* Verde più chiaro */
+        }
+
+		.section:hover .section-content {
+			max-height: 500px;
+			opacity: 1;
+		}
+		
+		/* Link stile cartella */
+		.section ul {
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+		}
+		
+		.section ul li {
+			margin-bottom: 10px;
+		}
+		
+		.section:first-of-type ul li a {
+			text-decoration: none;
+			color: #3498db;
+			font-weight: 500;
+			font-size: 16px;
+			display: inline-block;
+			padding: 12px 25px;
+			border: 2px solid transparent;
+			border-radius: 30px;
+			transition: background-color 0.4s, color 0.4s, box-shadow 0.3s;
+		}
+		
+		.section:first-of-type ul li a:hover {
+			background-color: #3498db;
+			color: white;
+			box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+			border: 2px solid #3498db;
+		}
+		
+		.section:nth-of-type(2) ul li a {
+			text-decoration: none;
+			color: #f1c40f;
+			font-weight: 500;
+			font-size: 16px;
+			display: inline-block;
+			padding: 12px 25px;
+			border: 2px solid transparent;
+			border-radius: 30px;
+			transition: background-color 0.4s, color 0.4s, box-shadow 0.3s;
+		}
+		
+		.section:nth-of-type(2) ul li a:hover {
+			background-color: #f1c40f;
+			color: white;
+			box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+			border: 2px solid #f1c40f;
+		}
+		
+		.section:nth-of-type(3) ul li a {
+			text-decoration: none;
+			color: #27ae60;
+			font-weight: 500;
+			font-size: 16px;
+			display: inline-block;
+			padding: 12px 25px;
+			border: 2px solid transparent;
+			border-radius: 30px;
+			transition: background-color 0.4s, color 0.4s, box-shadow 0.3s;
+		}
+		
+		.section:nth-of-type(3) ul li a:hover {
+			background-color: #27ae60;
+			color: white;
+			box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+			border: 2px solid #27ae60;
+		}
+		
+		/* Footer spettacolare */
+		#footer {
+			background: linear-gradient(135deg, #6dd5ed, #2193b0);
+			color: white;
+			padding: 20px;
+			font-size: 18px;
+			text-align: center;
+			margin-top: auto;
+			border-radius: 0 0 12px 12px;
+			box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+		
+		#footer p {
+			margin: 0;
+			font-weight: 600;
+		}
+		
+		/* Stile responsive */
+		@media (max-width: 768px) {
+			.sections-container {
+				flex-direction: column;
+			}
+		
+			.section {
+				margin-bottom: 30px;
+			}
+		}

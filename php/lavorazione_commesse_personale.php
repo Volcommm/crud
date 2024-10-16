@@ -334,26 +334,47 @@ if (!$result) {
 
     <!-- JavaScript for Edit Modal -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('body').addEventListener('click', function(event) {
-                if (event.target.classList.contains('btn-edit')) {
-                    const id = event.target.getAttribute('data-id');
-                    const modalContainer = document.getElementById('modalContainer');
-                    modalContainer.innerHTML = '';
-
-                    fetch('fetch_commessa_personale_modal.php?id=' + id + '&nocache=' + new Date().getTime())
-                        .then(response => response.text())
-                        .then(html => {
-                            modalContainer.innerHTML = html;
-                            var modal = new bootstrap.Modal(document.getElementById('editModal'));
-                            modal.show();
-                        })
-                        .catch(error => {
-                            console.error('Errore durante il caricamento del modale:', error);
-                        });
-                }
-            });
-        });
+	document.addEventListener('DOMContentLoaded', function() {
+		// Usa event delegation per gestire tutti i pulsanti con classe "btn-edit"
+		document.querySelector('body').addEventListener('click', function(event) {
+			if (event.target.classList.contains('btn-edit')) {
+				const id = event.target.getAttribute('data-id'); // Recupera l'id comm_fornitore
+	
+				// Svuota il contenuto precedente del modale solo se è aperto
+				const modalContainer = document.getElementById('modalContainer');
+				
+				// Chiudi eventuali modali aperti prima di mostrarne uno nuovo
+				var existingModal = document.getElementById('editModal');
+				if (existingModal) {
+					var modalInstance = bootstrap.Modal.getInstance(existingModal);
+					if (modalInstance) {
+						modalInstance.hide(); // Chiude il modale precedente se aperto
+					}
+					modalContainer.innerHTML = ''; // Svuota il contenuto del modale precedente
+				}
+	
+				// Effettua la richiesta AJAX per ottenere il contenuto del modale
+				fetch('fetch_commessa_personale_modal.php?id=' + id + '&nocache=' + new Date().getTime())
+					.then(response => response.text())
+					.then(html => {
+						// Inserisce il nuovo contenuto del modale
+						modalContainer.innerHTML = html;
+	
+						// Inizializza e mostra il nuovo modale
+						var modal = new bootstrap.Modal(document.getElementById('editModal'));
+						modal.show();
+	
+						// Aggiungi un event listener per svuotare il contenuto alla chiusura del modale
+						document.getElementById('editModal').addEventListener('hidden.bs.modal', function () {
+							modalContainer.innerHTML = ''; // Svuota il contenuto del modale alla chiusura
+						});
+					})
+					.catch(error => {
+						console.error('Errore durante il caricamento del modale:', error);
+					});
+			}
+		});
+	});
     </script>
 	<script>
 	let sortDirection = {};
