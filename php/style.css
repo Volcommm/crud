@@ -278,3 +278,35 @@ h1.text-center.display-4::before, h1.text-center.display-4::after {
     width: 20%; /* Imposta la larghezza del pulsante */
 }
 
+/* Ridurre la distanza tra i campi e migliorare il layout */
+#gestione-multiple .row.mb-3 .col-md-4 {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#gestione-multiple .container h1 {
+    margin-bottom: 20px; /* Ridotto per un aspetto più compatto */
+}
+
+/* Pulsante di invio migliorato */
+#gestione-multiple .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 25px;
+}
+/* Migliora l'allineamento verticale dei campi */
+#gestione-multiple .form-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+/* Effetto hover sui bottoni */
+#gestione-multiple .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
