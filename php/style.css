@@ -230,6 +230,7 @@ h1.text-center.display-4::before, h1.text-center.display-4::after {
     width: 100%;
 }
 
+
 /* Centra solo il pulsante Applica Filtri per Gestione Personale */
 #gestione-personale #filterForm .btn-primary {
     display: block;

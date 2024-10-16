@@ -43,6 +43,7 @@ if (!isset($_SESSION['valid'])) {
                         <li><a href="fornitori.php">Fornitori</a></li>
                         <li><a href="clienti.php">Clienti</a></li>
                         <li><a href="commesse.php">Commesse</a></li>
+						<li><a href="tipologie_riferimenti.php">Tipologie Riferimenti</a></li>
                     </ul>
                 </div>
             </div>
