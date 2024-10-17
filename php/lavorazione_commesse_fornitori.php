@@ -150,7 +150,9 @@ $fornitoreQuery = "SELECT DISTINCT fornitore FROM fornitori";
 $fornitoreResult = mysqli_query($mysqli, $fornitoreQuery);
 
 // Fetch unique idcommessa for filter
-$commessaQuery = "SELECT DISTINCT c.idcommessa, c.numero FROM commesse c";
+$commessaQuery = "SELECT DISTINCT c.idcommessa, c.numero 
+                  FROM commesse c
+                  WHERE LOWER(c.stato) = 'aperta'";
 $commessaResult = mysqli_query($mysqli, $commessaQuery);
 
 
@@ -161,7 +163,7 @@ $query = "SELECT cf.*, t.descr_rif, c.numero AS commessa, f.fornitore, DATE_FORM
           LEFT JOIN commesse c ON cf.idcommessa = c.idcommessa
           LEFT JOIN fornitori f ON cf.idfornitore = f.idfornitore
           LEFT JOIN tipologieriferimenti t ON cf.idtipologia_rif = t.idtipologia_rif
-          where (c.stato = 'aperta' or c.stato = 'Aperta')   ";
+          ";
 
 
 // Add search filter if provided

@@ -8,14 +8,19 @@ $query = "SELECT * FROM comm_fornitore WHERE idcomm_fornitore = $id";
 $result = mysqli_query($mysqli, $query);
 $data = mysqli_fetch_assoc($result);
 
-// Genera le opzioni per le commesse e fornitori
+// Genera le opzioni per le commesse, solo aperte o quella corrente
 $commessaOptions = '';
-$commessaResult = mysqli_query($mysqli, "SELECT idcommessa, numero FROM commesse");
+$commessaResult = mysqli_query($mysqli, "
+    SELECT idcommessa, numero FROM commesse 
+    WHERE LOWER(stato) = 'aperta' 
+    OR idcommessa = {$data['idcommessa']}
+");
 while ($commessaRow = mysqli_fetch_assoc($commessaResult)) {
     $selected = ($commessaRow['idcommessa'] == $data['idcommessa']) ? 'selected' : '';
     $commessaOptions .= "<option value='{$commessaRow['idcommessa']}' $selected>{$commessaRow['numero']}</option>";
 }
 
+// Genera le opzioni per i fornitori
 $fornitoreOptions = '';
 $fornitoreResult = mysqli_query($mysqli, "SELECT idfornitore, fornitore FROM fornitori");
 while ($fornitoreRow = mysqli_fetch_assoc($fornitoreResult)) {
@@ -23,13 +28,14 @@ while ($fornitoreRow = mysqli_fetch_assoc($fornitoreResult)) {
     $fornitoreOptions .= "<option value='{$fornitoreRow['idfornitore']}' $selected>{$fornitoreRow['fornitore']}</option>";
 }
 
-$idtipologia_rifOptions = "<option value=''>Seleziona un riferimento</option>"; // Aggiungi un'opzione di default
+// Genera le opzioni per le tipologie di riferimento
+$idtipologia_rifOptions = "<option value=''>Seleziona un riferimento</option>";
 $idtipologia_rifResult = mysqli_query($mysqli, "SELECT idtipologia_rif, descr_rif FROM tipologieriferimenti");
 while ($idtipologia_rifRow = mysqli_fetch_assoc($idtipologia_rifResult)) {
-    // Se l'id della tipologia riferimento coincide con il valore esistente nei dati ($data['idtipologia_rif'])
     $selected = ($idtipologia_rifRow['idtipologia_rif'] == $data['idtipologia_rif']) ? 'selected' : '';
     $idtipologia_rifOptions .= "<option value='{$idtipologia_rifRow['idtipologia_rif']}' $selected>{$idtipologia_rifRow['descr_rif']}</option>";
 }
+
 
 
 
