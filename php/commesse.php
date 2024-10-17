@@ -292,39 +292,38 @@ if (!$result) {
                         <td><?php echo htmlspecialchars($row['numero']); ?></td>
                         <td><?php echo htmlspecialchars($row['rifoff']); ?></td>
                         <td><?php echo htmlspecialchars($row['stato']); ?></td>
-                        <td><?php echo htmlspecialchars($row['dataapertura']); ?></td>
+                        <td><?php echo !empty($row['dataapertura']) ? date('d-m-Y', strtotime($row['dataapertura'])) : ''; ?></td>
                         <td><?php echo htmlspecialchars($row['cliente']); ?></td>
                         <td><?php echo htmlspecialchars($row['deslavoro']); ?></td>
 						<td>
 							<?php 
 							echo '€ ' . (floor($row['costooffertauscita']) == $row['costooffertauscita'] 
-										? number_format($row['costooffertauscita'], 0, ',', '.') 
-										: number_format($row['costooffertauscita'], 2, ',', '.')); 
+								? number_format($row['costooffertauscita'], 0, ',', '.') 
+								: number_format($row['costooffertauscita'], 2, ',', '.')); 
 							?>
 						</td>
 						<td>
 							<?php 
 							echo '€ ' . (floor($row['costo_tot_comm_prev']) == $row['costo_tot_comm_prev'] 
-										? number_format($row['costo_tot_comm_prev'], 0, ',', '.') 
-										: number_format($row['costo_tot_comm_prev'], 2, ',', '.')); 
+								? number_format($row['costo_tot_comm_prev'], 0, ',', '.') 
+								: number_format($row['costo_tot_comm_prev'], 2, ',', '.')); 
 							?>
 						</td>
 						<td>
 							<?php 
 							echo '€ ' . (floor($row['costo_tot_forn_prev']) == $row['costo_tot_forn_prev'] 
-										? number_format($row['costo_tot_forn_prev'], 0, ',', '.') 
-										: number_format($row['costo_tot_forn_prev'], 2, ',', '.')); 
+								? number_format($row['costo_tot_forn_prev'], 0, ',', '.') 
+								: number_format($row['costo_tot_forn_prev'], 2, ',', '.')); 
 							?>
 						</td>
 						<td>
 							<?php 
 							echo '€ ' . (floor($row['costo_tot_pers_prev']) == $row['costo_tot_pers_prev'] 
-										? number_format($row['costo_tot_pers_prev'], 0, ',', '.') 
-										: number_format($row['costo_tot_pers_prev'], 2, ',', '.')); 
+								? number_format($row['costo_tot_pers_prev'], 0, ',', '.') 
+								: number_format($row['costo_tot_pers_prev'], 2, ',', '.')); 
 							?>
 						</td>
-					
-                        <td><?php echo htmlspecialchars($row['datachiusura']); ?></td>
+                        <td><?php echo !empty($row['datachiusura']) ? date('d-m-Y', strtotime($row['datachiusura'])) : ''; ?></td>
                         <td class="action-column">
 							<div class="d-flex justify-content-end">
                             <button class="btn btn-edit btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $row['idcommessa']; ?>"><i class="fas fa-edit"></i></button>
@@ -434,6 +433,7 @@ if (!$result) {
 						<div class="mb-3">
 							<label for="stato" class="form-label">Stato</label>
 							<select name="stato" class="form-select" id="stato" required>
+								<option value="">Seleziona uno stato</option>
 								<option value="Aperta">Aperta</option>
 								<option value="Chiusa">Chiusa</option>
 								<option value="Archiviata">Archiviata</option>
@@ -446,6 +446,7 @@ if (!$result) {
                         <div class="mb-3">
                             <label for="idcliente" class="form-label">Cliente</label>
                             <select name="idcliente" class="form-select">
+							<option value="">Seleziona un cliente</option>
                                 <?php 
                                 $clienteQuery = "SELECT * FROM clienti";
                                 $clienteResult = mysqli_query($mysqli, $clienteQuery);
@@ -571,16 +572,22 @@ function sortTable(columnIndex, thElement) {
     let table = thElement.closest('table');
     let rows = Array.from(table.querySelectorAll('tbody tr'));
     let isAscending = sortDirection[columnIndex] !== 'asc'; // Se già ascendente, sarà discendente, altrimenti ascendente
-    
+
     rows.sort((rowA, rowB) => {
         let cellA = rowA.cells[columnIndex].innerText.trim();
         let cellB = rowB.cells[columnIndex].innerText.trim();
 
         // Gestione delle colonne in valuta (Offerta in Uscita, Costo Totale Previsto, ecc.)
-        if (columnIndex === 6 || columnIndex >= 7 && columnIndex <= 10) {
-            let numA = parseFloat(cellA.replace(/[^0-9.-]+/g,"")); // Rimuovi simboli non numerici
-            let numB = parseFloat(cellB.replace(/[^0-9.-]+/g,""));
+        if (columnIndex === 6 || columnIndex >= 7 && columnIndex <= 9) {
+            let numA = parseFloat(cellA.replace(/[^\d,-]+/g, '').replace(/\./g, '').replace(',', '.')); // Rimuovi simboli non numerici e sostituisci ',' con '.'
+            let numB = parseFloat(cellB.replace(/[^\d,-]+/g, '').replace(/\./g, '').replace(',', '.'));
             return isAscending ? numA - numB : numB - numA;
+        }
+        // Gestione delle colonne di data (Data Apertura, Data Chiusura, ecc.)
+        else if (columnIndex === 3 || columnIndex === 10) {
+            let dateA = new Date(cellA.split('-').reverse().join('-')); // Converti "dd-mm-yyyy" in "yyyy-mm-dd"
+            let dateB = new Date(cellB.split('-').reverse().join('-'));
+            return isAscending ? dateA - dateB : dateB - dateA;
         }
         // Gestione per testo (Cliente, Descrizione Lavoro, ecc.)
         else {
