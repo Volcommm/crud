@@ -157,42 +157,49 @@ $commessaResult = mysqli_query($mysqli, $commessaQuery);
 
 
 
-// Construct the query with JOIN to fetch commesse, fornitori, and related data
+// Costruzione della query principale
 $query = "SELECT cf.*, t.descr_rif, c.numero AS commessa, f.fornitore, DATE_FORMAT(cf.datains, '%d/%m/%Y') as datai 
           FROM comm_fornitore cf
           LEFT JOIN commesse c ON cf.idcommessa = c.idcommessa
           LEFT JOIN fornitori f ON cf.idfornitore = f.idfornitore
-          LEFT JOIN tipologieriferimenti t ON cf.idtipologia_rif = t.idtipologia_rif
-          ";
+          LEFT JOIN tipologieriferimenti t ON cf.idtipologia_rif = t.idtipologia_rif";
 
+// Aggiungi una clausola WHERE dinamica
+$whereConditions = [];
 
-// Add search filter if provided
+// Filtro ricerca
 if (!empty($_GET['search'])) {
-    $searchTerm = mysqli_real_escape_string($mysqli, $_GET['search']); // Escape the search term
-    $query .= " and (c.numero LIKE '%$searchTerm%' OR f.fornitore LIKE '%$searchTerm%')";
+    $searchTerm = mysqli_real_escape_string($mysqli, $_GET['search']);
+    $whereConditions[] = "(c.numero LIKE '%$searchTerm%' OR f.fornitore LIKE '%$searchTerm%')";
 }
 
-// Add filter by fornitore
+// Filtro fornitore
 if (!empty($_GET['fornitore'])) {
     $fornitori = $_GET['fornitore'];
     $fornitoreFilter = implode("','", array_map(function($fornitore) use ($mysqli) {
-        return mysqli_real_escape_string($mysqli, $fornitore); // Escape each fornitore
+        return mysqli_real_escape_string($mysqli, $fornitore);
     }, $fornitori));
-    $query .= !empty($_GET['search']) ? " and f.fornitore IN ('$fornitoreFilter')" : " and f.fornitore IN ('$fornitoreFilter')";
+    $whereConditions[] = "f.fornitore IN ('$fornitoreFilter')";
 }
 
-// Add filter by commessa
+// Filtro commessa
 if (!empty($_GET['idcommessa'])) {
     $commesse = $_GET['idcommessa'];
-    $commessaFilter = implode(",", array_map('intval', $commesse)); // Ensure it's an integer
-    $query .= (!empty($_GET['search']) || !empty($_GET['fornitore'])) ? " AND cf.idcommessa IN ($commessaFilter)" : " and cf.idcommessa IN ($commessaFilter)";
+    $commessaFilter = implode(",", array_map('intval', $commesse));
+    $whereConditions[] = "cf.idcommessa IN ($commessaFilter)";
 }
 
-// Aggiungi il limite di righe e l'offset per la paginazione
+// Combina tutte le condizioni nella query
+if (count($whereConditions) > 0) {
+    $query .= " WHERE " . implode(' AND ', $whereConditions);
+}
+
+// Aggiungi ordinamento alla query
 $query .= " ORDER BY cf.idcomm_fornitore DESC";
 
 // Esegui la query
 $result = mysqli_query($mysqli, $query);
+
 
 // Controllo errori SQL
 if (!$result) {
