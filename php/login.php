@@ -13,58 +13,139 @@ include("connection.php");
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f4f6f9; /* Sfondo chiaro coerente */
-            color: #333; /* Colore del testo */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa; /* Sfondo chiaro */
+            color: #212529; /* Testo scuro */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            position: relative;
+            overflow: hidden;
         }
+
         .container {
-            margin-top: 100px;
-            padding: 30px;
             background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 1.5s ease-in-out forwards;
+            opacity: 0;
         }
-        #header {
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Titolo con barre animate */
+        h1.text-center.display-4 {
+            position: relative;
+            font-weight: bold !important;
+            color: #34495e !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            margin-bottom: 30px !important;
+            padding-bottom: 10px !important;
+            background: none !important;
+            overflow: hidden;
             text-align: center;
-            margin-bottom: 30px;
         }
-        .alert {
-            background-color: #f8d7da; /* Colore dello sfondo dell'alert per gli errori */
-            color: #721c24; /* Colore del testo dell'alert */
+
+        h1.text-center.display-4::before, h1.text-center.display-4::after {
+            content: '';
+            position: absolute;
+            height: 2px;
+            width: 0;
+            bottom: 0;
+            background-color: #2980b9;
+            z-index: 1;
+            animation: move-bar 2s ease infinite alternate;
         }
+
+        h1.text-center.display-4::before {
+            left: 0;
+            background-color: #2980b9;
+        }
+
+        h1.text-center.display-4::after {
+            right: 0;
+            background-color: #e74c3c;
+        }
+
+        @keyframes move-bar {
+            0% {
+                width: 0;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        /* Animazione input */
         .form-control {
-            background-color: #f8f9fa; /* Sfondo input chiaro */
-            color: #495057; /* Colore del testo input */
-            border: 1px solid #ced4da; /* Bordo dell'input */
+            background-color: #ffffff;
+            border: none;
+            border-bottom: 2px solid #2980b9;
+            color: #212529;
+            transition: all 0.4s ease;
+            padding: 10px;
         }
-        .form-control::placeholder {
-            color: #adb5bd; /* Colore del placeholder */
+
+        .form-control:focus {
+            border-bottom-color: #e74c3c;
+            box-shadow: none;
         }
+
+        /* Bottoni */
         .btn-primary {
-            background-color: #007bff; /* Colore del bottone primario */
-            border-color: #007bff; /* Colore del bordo del bottone primario */
-        }
-        .btn-primary:hover {
-            opacity: 0.9; /* Leggero effetto hover */
-        }
-        .btn-link {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            border-radius: 50px;
+            padding: 12px 20px;
             font-size: 14px;
-            color: #007bff;
+            font-weight: bold;
+            transition: all 0.4s ease;
+            display: block;
+            width: 100%;
+            margin: 20px 0;
         }
-        .btn-link:hover {
-            text-decoration: underline;
+
+        .btn-primary:hover {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+            transform: scale(1.05);
         }
-        .text-center {
+
+        .alert {
+            background-color: #e74c3c;
+            color: white;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
             text-align: center;
+            animation: slideDown 0.6s ease-in-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <div id="header">
-            <h1>Accesso a Commessa</h1>
-        </div>
+        <h1 class="text-center display-4">Accesso a Commessa</h1>
 
         <?php
         if (isset($_POST['submit'])) {
@@ -73,25 +154,20 @@ include("connection.php");
 
             if ($user == "" || $pass == "") {
                 echo "<div class='alert alert-danger' role='alert'>Il campo username o password è vuoto.</div>";
-                echo "<a href='login.php' class='btn btn-primary'>Torna indietro</a>";
             } else {
-                $result = mysqli_query($mysqli, "SELECT * FROM login WHERE username='$user' AND password=md5('$pass')")
-                            or die("Could not execute the select query.");
+                $result = mysqli_query($mysqli, "SELECT * FROM login WHERE username='$user' AND password=md5('$pass')") or die("Could not execute the select query.");
                 
                 $row = mysqli_fetch_assoc($result);
                 
                 if (is_array($row) && !empty($row)) {
-                    $validuser = $row['username'];
-                    $_SESSION['valid'] = $validuser;
+                    $_SESSION['valid'] = $row['username'];
                     $_SESSION['name'] = $row['name'];
                     $_SESSION['id'] = $row['id'];
 
-                    // Redirect to index.php if login is successful
                     header('Location: index.php');
-                    exit(); // Assicurati di terminare lo script dopo il redirect
+                    exit();
                 } else {
                     echo "<div class='alert alert-danger' role='alert'>Username o password non validi.</div>";
-                    echo "<a href='login.php' class='btn btn-primary'>Torna indietro</a>";
                 }
             }
         } else {
@@ -105,9 +181,7 @@ include("connection.php");
                     <label for="password" class="form-label">Password</label>
                     <input type="password" name="password" class="form-control" id="password" required placeholder="Inserisci password">
                 </div>
-                <div class="text-center">
-                    <button type="submit" name="submit" class="btn btn-primary">Invia</button>
-                </div>
+                <button type="submit" name="submit" class="btn btn-primary">Invia</button>
             </form>
         <?php
         }
@@ -119,5 +193,5 @@ include("connection.php");
 </html>
 
 <?php
-ob_end_flush(); // Invio dell'output finale
+ob_end_flush();
 ?>
