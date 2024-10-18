@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $personaleQuery = "SELECT idpersonale, nome FROM personale";
 $personaleResult = mysqli_query($mysqli, $personaleQuery);
 
-$commessaQuery = "SELECT idcommessa, numero FROM commesse";
+$commessaQuery = "SELECT idcommessa, numero FROM commesse WHERE LOWER(stato) = 'aperta' ORDER BY numero DESC";
 $commessaResult = mysqli_query($mysqli, $commessaQuery);
 
 ?>

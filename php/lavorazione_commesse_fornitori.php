@@ -152,7 +152,8 @@ $fornitoreResult = mysqli_query($mysqli, $fornitoreQuery);
 // Fetch unique idcommessa for filter
 $commessaQuery = "SELECT DISTINCT c.idcommessa, c.numero 
                   FROM commesse c
-                  WHERE LOWER(c.stato) = 'aperta'";
+                  WHERE LOWER(c.stato) = 'aperta'
+                  ORDER BY c.numero DESC";
 $commessaResult = mysqli_query($mysqli, $commessaQuery);
 
 

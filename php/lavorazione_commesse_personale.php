@@ -74,7 +74,10 @@ if (isset($_POST['update'])) {
 $personaleQuery = "SELECT DISTINCT nome FROM personale";
 $personaleResult = mysqli_query($mysqli, $personaleQuery);
 
-$commessaQuery = "SELECT DISTINCT idcommessa, numero FROM commesse";
+$commessaQuery = "SELECT DISTINCT c.idcommessa, c.numero 
+                  FROM commesse c
+                  WHERE LOWER(c.stato) = 'aperta'
+                  ORDER BY c.numero DESC";
 $commessaResult = mysqli_query($mysqli, $commessaQuery);
 
 // Main query
@@ -235,9 +238,10 @@ if (!$result) {
                     </div>
 
                     <!-- Query for commesse -->
+
                     <?php
-                    $commessaResult = mysqli_query($mysqli, "SELECT idcommessa, numero FROM commesse");
-                    ?>
+						$commessaResult = mysqli_query($mysqli, "SELECT idcommessa, numero FROM commesse WHERE LOWER(stato) = 'aperta' ORDER BY numero DESC");
+					?>
                     <div class="mb-3">
                         <label for="idcommessa" class="form-label">Commessa</label>
                         <select name="idcommessa" class="form-select" required>

@@ -14,6 +14,7 @@ $commessaResult = mysqli_query($mysqli, "
     SELECT idcommessa, numero FROM commesse 
     WHERE LOWER(stato) = 'aperta' 
     OR idcommessa = {$data['idcommessa']}
+	ORDER BY numero DESC
 ");
 while ($commessaRow = mysqli_fetch_assoc($commessaResult)) {
     $selected = ($commessaRow['idcommessa'] == $data['idcommessa']) ? 'selected' : '';

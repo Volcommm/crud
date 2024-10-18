@@ -10,7 +10,7 @@ $data = mysqli_fetch_assoc($result);
 
 // Genera le opzioni per le commesse e personale
 $commessaOptions = '';
-$commessaResult = mysqli_query($mysqli, "SELECT idcommessa, numero FROM commesse");
+$commessaResult = mysqli_query($mysqli, "SELECT idcommessa, numero FROM commesse WHERE LOWER(stato) = 'aperta' ORDER BY numero DESC");
 while ($commessaRow = mysqli_fetch_assoc($commessaResult)) {
     $selected = ($commessaRow['idcommessa'] == $data['idcommessa']) ? 'selected' : '';
     $commessaOptions .= "<option value='{$commessaRow['idcommessa']}' $selected>{$commessaRow['numero']}</option>";

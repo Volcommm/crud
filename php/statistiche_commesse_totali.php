@@ -16,7 +16,8 @@ $selectcommessa = isset($_POST['commessa']) ? mysqli_real_escape_string($mysqli,
 $commessaQuery = "SELECT commesse.idcommessa, commesse.numero, clienti.cliente 
                   FROM commesse 
                   LEFT JOIN clienti ON clienti.idcliente = commesse.idcliente 
-                  ORDER BY dataapertura DESC";
+				  WHERE LOWER(commesse.stato) IN ('aperta', 'chiusa')
+                  ORDER BY commesse.numero DESC";
 $commessaResult = mysqli_query($mysqli, $commessaQuery);
 
 // Variabile per il numero della commessa selezionata
