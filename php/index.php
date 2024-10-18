@@ -119,7 +119,7 @@ while ($row = mysqli_fetch_assoc($commesseSottoPercAlertResult)) {
 
     <?php if (count($commesseSottoPercAlert) > 0) { ?>
         <div class="alert alert-warning alert-dismissible fade show text-center" role="alert" id="commesse-banner">
-            <strong>Attenzione!</strong> Le seguenti commesse hanno un Utile % su Offerta inferiore al loro PercAlert: 
+            <strong>Attenzione!</strong> Le seguenti commesse hanno una % di utile inferiore alla loro soglia di percentuale : 
             <?php echo implode(', ', $commesseSottoPercAlert); ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
