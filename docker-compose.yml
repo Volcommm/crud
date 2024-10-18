@@ -10,7 +10,7 @@ services:
       - db
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-    command: /bin/bash -c "docker-php-ext-install mysqli && apache2-foreground"  # Installa l'estensione mysqli e avvia Apache
+    command: /bin/bash -c "apt-get update && apt-get install -y mariadb-client && docker-php-ext-install mysqli && apache2-foreground"  # Installa l'estensione mysqli e avvia Apache
   db:
     image: mariadb:10.4.33
     environment:

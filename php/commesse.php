@@ -125,7 +125,10 @@ if (isset($_GET['delete_id'])) {
 }
 
 // Fetch unique numbers for filter
-$numeroQuery = "SELECT DISTINCT numero FROM commesse";
+$numeroQuery = "SELECT DISTINCT c.idcommessa, c.numero 
+                  FROM commesse c
+                  WHERE LOWER(c.stato) = 'aperta'
+                  ORDER BY c.numero DESC";
 $numeroResult = mysqli_query($mysqli, $numeroQuery);
 
 // Fetch unique clients for filter
@@ -404,7 +407,7 @@ if (!$result) {
                                             <label for="percalert" class="form-label">Percentuale Alert</label>
                                             <input type="text" name="percalert" class="form-control" id="percalert" value="<?php echo htmlspecialchars($row['percalert']); ?>" required>
                                         </div>
-					<div class="mb-3">
+										<div class="mb-3">
                                             <label for="datachiusura" class="form-label">Data Chiusura</label>
                                             <input type="date" name="datachiusura" class="form-control" id="datachiusura" value="<?php echo htmlspecialchars($row['datachiusura']); ?>">
                                         </div>

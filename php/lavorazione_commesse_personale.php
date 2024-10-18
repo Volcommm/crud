@@ -392,29 +392,41 @@ if (!$result) {
 			let cellA = rowA.cells[columnIndex].innerText.trim();
 			let cellB = rowB.cells[columnIndex].innerText.trim();
 	
-			// Gestione delle colonne in valuta (Offerta in Uscita, Costo Totale Previsto, ecc.)
-			if (columnIndex === 6 || columnIndex >= 7 && columnIndex <= 10) {
-				let numA = parseFloat(cellA.replace(/[^0-9.-]+/g,"")); // Rimuovi simboli non numerici
-				let numB = parseFloat(cellB.replace(/[^0-9.-]+/g,""));
+			if (columnIndex === 0) { // Supponendo che la data sia nella colonna 0
+				// Convertiamo la data da "DD/MM/YYYY" a "YYYY-MM-DD" per confrontare correttamente le date
+				let [dayA, monthA, yearA] = cellA.split('/').map(Number);
+				let [dayB, monthB, yearB] = cellB.split('/').map(Number);
+	
+				// Creiamo l'oggetto Date con il formato corretto (anno, mese -1, giorno)
+				let formattedDateA = new Date(yearA, monthA - 1, dayA);
+				let formattedDateB = new Date(yearB, monthB - 1, dayB);
+	
+				return isAscending ? formattedDateA - formattedDateB : formattedDateB - formattedDateA;
+			}
+	
+			// Gestione delle colonne numeriche (ad esempio, la colonna delle ore)
+			else if (columnIndex === 3) { // Supponendo che la colonna delle ore sia la 3
+				let numA = parseFloat(cellA.replace(/[^0-9,.-]+/g, "").replace(".", "").replace(",", "."));
+				let numB = parseFloat(cellB.replace(/[^0-9,.-]+/g, "").replace(".", "").replace(",", "."));
 				return isAscending ? numA - numB : numB - numA;
 			}
-			// Gestione per testo (Cliente, Descrizione Lavoro, ecc.)
+			// Ordinamento testuale (ad esempio, commessa o personale)
 			else {
 				return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
 			}
 		});
 	
-		// Aggiorna la tabella
+		// Aggiorna la tabella con le righe ordinate
 		let tbody = table.querySelector('tbody');
 		rows.forEach(row => tbody.appendChild(row));
 	
-		// Aggiorna l'icona
+		// Aggiorna l'icona dell'ordinamento
 		table.querySelectorAll('th .sort-icon').forEach(icon => {
-			icon.innerHTML = '<i class="fas fa-sort"></i>'; // Resetta tutte le icone
+			icon.innerHTML = '<i class="fas fa-sort"></i>'; // Reset icone
 		});
 		thElement.querySelector('.sort-icon').innerHTML = isAscending ? '<i class="fas fa-sort-up"></i>' : '<i class="fas fa-sort-down"></i>';
 	
-		// Memorizza la direzione attuale per questa colonna
+		// Memorizza la direzione di ordinamento per la colonna
 		sortDirection[columnIndex] = isAscending ? 'asc' : 'desc';
 	}
 

@@ -164,9 +164,9 @@ CREATE TABLE `commesse` (
   `costo_tot_comm_prev` double DEFAULT NULL,
   `costo_tot_forn_prev` double DEFAULT NULL,
   `costo_tot_pers_prev` double DEFAULT NULL,
-  `datachiusura` date DEFAULT NULL
-  `percalert` int(11) DEFAULT 50,
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `datachiusura` date DEFAULT NULL,
+  `percalert` int(11) DEFAULT 50
+) ENGINE=InnoDB;
 
 --
 -- Dumping data for table `commesse`

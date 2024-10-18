@@ -411,8 +411,16 @@ if (!empty($_GET['idcommessa'])) {
         </thead>
         <tbody>
 <?php while ($row = mysqli_fetch_assoc($result)) { ?>
-    <tr>
-        <td><?php echo !empty($row['datai']) ? date('d-m-Y', strtotime($row['datai'])) : ''; ?></td>
+		<td>
+			<?php 
+			// Converte da formato 'YYYY-MM-DD' a 'DD-MM-YYYY' solo se il valore non è vuoto o nullo
+			if (!empty($row['datains'])) {
+				echo date('d-m-Y', strtotime($row['datains']));
+			} else {
+				echo ''; // Campo vuoto se la data non è valida
+			}
+			?>
+		</td>
 	    <td><?php echo htmlspecialchars($row['commessa']); ?></td>
 	    <td><?php echo htmlspecialchars($row['fornitore']); ?></td>
 	    <td>
@@ -601,43 +609,50 @@ function sortTable(columnIndex, thElement) {
     let table = thElement.closest('table');
     let rows = Array.from(table.querySelectorAll('tbody tr'));
     let isAscending = sortDirection[columnIndex] !== 'asc'; // Se già ascendente, sarà discendente, altrimenti ascendente
-    
+
     rows.sort((rowA, rowB) => {
         let cellA = rowA.cells[columnIndex].innerText.trim();
         let cellB = rowB.cells[columnIndex].innerText.trim();
 
-        // Gestione dell'ordinamento per data (colonna 0)
-        if (columnIndex === 0) {
-            let dateA = new Date(cellA.split('/').reverse().join('-')); // Converti 'DD/MM/YYYY' in 'YYYY-MM-DD'
-            let dateB = new Date(cellB.split('/').reverse().join('-'));
-            return isAscending ? dateA - dateB : dateB - dateA;
+        // Ordinamento delle date
+        if (columnIndex === 0) { // Supponendo che la data sia nella colonna 0
+            // Convertiamo la data da "DD-MM-YYYY" a "YYYY-MM-DD" per confrontare correttamente le date
+            let [dayA, monthA, yearA] = cellA.split('-').map(Number);
+            let [dayB, monthB, yearB] = cellB.split('-').map(Number);
+
+            // Creiamo l'oggetto Date con il formato corretto (anno, mese -1, giorno)
+            let formattedDateA = new Date(yearA, monthA - 1, dayA);
+            let formattedDateB = new Date(yearB, monthB - 1, dayB);
+
+            return isAscending ? formattedDateA - formattedDateB : formattedDateB - formattedDateA;
         }
+
         // Gestione delle colonne in valuta (colonna 2, 6 e da 7 a 10)
         else if (columnIndex === 3 || columnIndex === 6 || (columnIndex >= 7 && columnIndex <= 10)) {
-            // Rimuovi simboli di valuta e separatori delle migliaia, e sostituisci la virgola con un punto decimale
             let numA = parseFloat(cellA.replace(/[^0-9,.-]+/g, "").replace(".", "").replace(",", "."));
             let numB = parseFloat(cellB.replace(/[^0-9,.-]+/g, "").replace(".", "").replace(",", "."));
             return isAscending ? numA - numB : numB - numA;
         }
-        // Gestione per testo
+        // Ordinamento testuale
         else {
             return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
         }
     });
 
-    // Aggiorna la tabella
+    // Aggiorna la tabella con le righe ordinate
     let tbody = table.querySelector('tbody');
     rows.forEach(row => tbody.appendChild(row));
 
-    // Aggiorna l'icona
+    // Aggiorna l'icona dell'ordinamento
     table.querySelectorAll('th .sort-icon').forEach(icon => {
-        icon.innerHTML = '<i class="fas fa-sort"></i>'; // Resetta tutte le icone
+        icon.innerHTML = '<i class="fas fa-sort"></i>'; // Reset icone
     });
     thElement.querySelector('.sort-icon').innerHTML = isAscending ? '<i class="fas fa-sort-up"></i>' : '<i class="fas fa-sort-down"></i>';
 
-    // Memorizza la direzione attuale per questa colonna
+    // Memorizza la direzione di ordinamento per la colonna
     sortDirection[columnIndex] = isAscending ? 'asc' : 'desc';
 }
+
 
 
 
