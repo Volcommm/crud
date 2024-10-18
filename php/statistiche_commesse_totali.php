@@ -31,6 +31,18 @@ if (!empty($selectcommessa)) {
         $numeroCommessa = $numeroCommessaRow['numero'];
     }
 }
+
+$clienteCommessa = '';
+if (!empty($selectcommessa)) {
+    $clienteCommessaQuery = "SELECT clienti.cliente FROM commesse 
+                             LEFT JOIN clienti ON clienti.idcliente = commesse.idcliente 
+                             WHERE commesse.idcommessa = '$selectcommessa'";
+    $clienteCommessaResult = mysqli_query($mysqli, $clienteCommessaQuery);
+    if ($clienteCommessaRow = mysqli_fetch_assoc($clienteCommessaResult)) {
+        $clienteCommessa = $clienteCommessaRow['cliente'];
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -315,6 +327,13 @@ if (!empty($selectcommessa)) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 <script>
+    var numeroCommessa = "<?php echo !empty($numeroCommessa) ? htmlspecialchars($numeroCommessa) : 'commessa'; ?>";
+    var clienteCommessa = "<?php echo !empty($clienteCommessa) ? htmlspecialchars($clienteCommessa) : 'cliente'; ?>";
+	clienteCommessa = clienteCommessa.replace(/\s+/g, '');
+</script>
+
+
+<script>
 
 function exportToExcel() {
     var workbook = XLSX.utils.book_new();  // Crea un nuovo workbook
@@ -358,9 +377,13 @@ function exportToExcel() {
         XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);  // Aggiungi il foglio al workbook con il nome specificato
     });
 
+    // Usa il numero della commessa nel nome del file
+    var fileName = "statistiche_commessa_" + numeroCommessa + "_" + clienteCommessa + ".xlsx";
+
     // Salva il file Excel con tutte le tabelle in vari fogli
-    XLSX.writeFile(workbook, "statistiche_commesse_fornitori.xlsx");
+    XLSX.writeFile(workbook, fileName);
 }
+
 
 function exportToPDF() {
     var { jsPDF } = window.jspdf;
@@ -431,9 +454,13 @@ function exportToPDF() {
         currentY = doc.autoTable.previous.finalY + 10;
     });
 
+    // Usa il numero della commessa nel nome del file
+    var fileName = "statistiche_commessa_" + numeroCommessa + "_" + clienteCommessa + ".pdf";
+
     // Salva il file PDF
-    doc.save('statistiche_commesse_fornitori.pdf');
+    doc.save(fileName);
 }
+
 
 
 </script>
