@@ -145,9 +145,11 @@ if (isset($_POST['update'])) {
 }
 
 
-// Fetch unique names for filter (using fornitori)
-$fornitoreQuery = "SELECT DISTINCT fornitore FROM fornitori";
+
+// Fetch unique names for filter (using fornitori ordered alphabetically)
+$fornitoreQuery = "SELECT DISTINCT fornitore FROM fornitori ORDER BY fornitore ASC";
 $fornitoreResult = mysqli_query($mysqli, $fornitoreQuery);
+
 
 // Fetch unique idcommessa for filter
 $commessaQuery = "SELECT DISTINCT c.idcommessa, c.numero 
@@ -337,7 +339,7 @@ if (!empty($_GET['idcommessa'])) {
 
                     <!-- Fornitore -->
                     <?php
-                    $fornitoreResult = mysqli_query($mysqli, "SELECT idfornitore, fornitore FROM fornitori");
+                    $fornitoreResult = mysqli_query($mysqli, "SELECT idfornitore, fornitore FROM fornitori ORDER BY fornitore ASC");
                     ?>
                     <div class="mb-3">
                         <label for="idfornitore" class="form-label">Fornitore</label>

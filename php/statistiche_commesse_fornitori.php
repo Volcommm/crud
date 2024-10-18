@@ -61,7 +61,7 @@ if (!$result) {
 
 // Query per ottenere i numeri delle commesse e i fornitori per i filtri
 $numeriCommessaResult = mysqli_query($mysqli, "SELECT idcommessa, numero FROM commesse WHERE LOWER(stato) IN ('aperta', 'chiusa')  ORDER BY numero DESC");
-$fornitoreResult = mysqli_query($mysqli, "SELECT DISTINCT fornitore FROM fornitori");
+$fornitoreResult = mysqli_query($mysqli, "SELECT DISTINCT fornitore FROM fornitori ORDER BY fornitore ASC");
 ?>
 <!DOCTYPE html>
 <html lang="it">

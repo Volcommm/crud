@@ -131,10 +131,13 @@ $numeroQuery = "SELECT DISTINCT c.idcommessa, c.numero
                   ORDER BY c.numero DESC";
 $numeroResult = mysqli_query($mysqli, $numeroQuery);
 
-// Fetch unique clients for filter
-$clienteQuery = "SELECT DISTINCT c.idcliente, c.cliente FROM commesse co
-                   JOIN clienti c ON co.idcliente = c.idcliente";
+
+// Fetch unique clients for filter (ordered alphabetically by client name)
+$clienteQuery = "SELECT DISTINCT c.idcliente, c.cliente FROM clienti c 
+                 JOIN commesse co ON co.idcliente = c.idcliente 
+                 ORDER BY c.cliente ASC";
 $clienteResult = mysqli_query($mysqli, $clienteQuery);
+
 
 // Modifica della query per filtrare le commesse
 $query = "SELECT co.*, c.cliente FROM commesse co LEFT JOIN clienti c ON co.idcliente = c.idcliente WHERE co.stato != 'Archiviata'";
@@ -374,7 +377,7 @@ if (!$result) {
                                             <select name="idcliente" class="form-select">
 											<option value="">Seleziona un cliente</option> <!-- Aggiungi l'opzione di default -->
                                                 <?php 
-                                                $clienteQuery = "SELECT * FROM clienti";
+                                                $clienteQuery = "SELECT * FROM clienti ORDER BY cliente ASC";
                                                 $clienteResult = mysqli_query($mysqli, $clienteQuery);
                                                 while ($clienteRow = mysqli_fetch_assoc($clienteResult)) { ?>
                                                     <option value="<?php echo $clienteRow['idcliente']; ?>" <?php if($row['idcliente'] == $clienteRow['idcliente']) echo 'selected'; ?>>
@@ -458,7 +461,7 @@ if (!$result) {
                             <select name="idcliente" class="form-select">
 							<option value="">Seleziona un cliente</option>
                                 <?php 
-                                $clienteQuery = "SELECT * FROM clienti";
+                                $clienteQuery = "SELECT * FROM clienti ORDER BY cliente ASC";
                                 $clienteResult = mysqli_query($mysqli, $clienteQuery);
                                 while ($clienteRow = mysqli_fetch_assoc($clienteResult)) { ?>
                                     <option value="<?php echo $clienteRow['idcliente']; ?>">

@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Query per recuperare i dati necessari per i selettori
-$personaleQuery = "SELECT idpersonale, nome FROM personale";
+$personaleQuery = "SELECT idpersonale, nome FROM personale ORDER BY nome ASC";
 $personaleResult = mysqli_query($mysqli, $personaleQuery);
 
 $commessaQuery = "SELECT idcommessa, numero FROM commesse WHERE LOWER(stato) = 'aperta' ORDER BY numero DESC";

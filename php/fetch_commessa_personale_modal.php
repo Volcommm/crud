@@ -17,7 +17,7 @@ while ($commessaRow = mysqli_fetch_assoc($commessaResult)) {
 }
 
 $personaleOptions = '';
-$personaleResult = mysqli_query($mysqli, "SELECT idpersonale, nome FROM personale");
+$personaleResult = mysqli_query($mysqli, "SELECT idpersonale, nome FROM personale ORDER BY nome ASC");
 while ($personaleRow = mysqli_fetch_assoc($personaleResult)) {
     $selected = ($personaleRow['idpersonale'] == $data['idpersonale']) ? 'selected' : '';
     $personaleOptions .= "<option value='{$personaleRow['idpersonale']}' $selected>{$personaleRow['nome']}</option>";

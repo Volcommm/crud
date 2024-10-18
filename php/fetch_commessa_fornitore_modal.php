@@ -23,7 +23,7 @@ while ($commessaRow = mysqli_fetch_assoc($commessaResult)) {
 
 // Genera le opzioni per i fornitori
 $fornitoreOptions = '';
-$fornitoreResult = mysqli_query($mysqli, "SELECT idfornitore, fornitore FROM fornitori");
+$fornitoreResult = mysqli_query($mysqli, "SELECT idfornitore, fornitore FROM fornitori ORDER BY fornitore ASC");
 while ($fornitoreRow = mysqli_fetch_assoc($fornitoreResult)) {
     $selected = ($fornitoreRow['idfornitore'] == $data['idfornitore']) ? 'selected' : '';
     $fornitoreOptions .= "<option value='{$fornitoreRow['idfornitore']}' $selected>{$fornitoreRow['fornitore']}</option>";

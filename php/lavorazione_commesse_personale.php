@@ -71,7 +71,7 @@ if (isset($_POST['update'])) {
 }
 
 // Fetch data for filters
-$personaleQuery = "SELECT DISTINCT nome FROM personale";
+$personaleQuery = "SELECT DISTINCT nome FROM personale ORDER BY nome ASC";
 $personaleResult = mysqli_query($mysqli, $personaleQuery);
 
 $commessaQuery = "SELECT DISTINCT c.idcommessa, c.numero 
@@ -256,7 +256,7 @@ if (!$result) {
 
                     <!-- Query for personale -->
                     <?php
-                    $personaleResult = mysqli_query($mysqli, "SELECT idpersonale, nome FROM personale");
+                    $personaleResult = mysqli_query($mysqli, "SELECT idpersonale, nome FROM personale ORDER BY nome ASC");
                     ?>
                     <div class="mb-3">
                         <label for="idpersonale" class="form-label">Personale</label>

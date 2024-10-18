@@ -72,7 +72,7 @@ if (!$result) {
 
 // Query per ottenere i numeri delle commesse e il personale per i filtri
 $numeriCommessaResult = mysqli_query($mysqli, "SELECT idcommessa, numero FROM commesse WHERE LOWER(stato) IN ('aperta', 'chiusa')  ORDER BY numero DESC");
-$personaleResult = mysqli_query($mysqli, "SELECT DISTINCT nome FROM personale");
+$personaleResult = mysqli_query($mysqli, "SELECT DISTINCT nome FROM personale ORDER BY nome ASC");
 ?>
 <!DOCTYPE html>
 <html lang="it">
