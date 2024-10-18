@@ -29,6 +29,7 @@ if (isset($_POST['add'])) {
     $costo_tot_comm_prev = !empty($_POST['costo_tot_comm_prev']) ? mysqli_real_escape_string($mysqli, $_POST['costo_tot_comm_prev']) : 0;
     $costo_tot_forn_prev = !empty($_POST['costo_tot_forn_prev']) ? mysqli_real_escape_string($mysqli, $_POST['costo_tot_forn_prev']) : 0;
     $costo_tot_pers_prev = !empty($_POST['costo_tot_pers_prev']) ? mysqli_real_escape_string($mysqli, $_POST['costo_tot_pers_prev']) : 0;
+    $percalert = mysqli_real_escape_string($mysqli, $_POST['percalert']);
     // Gestione dei campi di data: se vuoti, impostali su NULL
     $dataapertura = !empty($_POST['dataapertura']) ? "'" . mysqli_real_escape_string($mysqli, $_POST['dataapertura']) . "'" : "NULL";
     $datachiusura = !empty($_POST['datachiusura']) ? "'" . mysqli_real_escape_string($mysqli, $_POST['datachiusura']) . "'" : "NULL";
@@ -38,8 +39,8 @@ if (isset($_POST['add'])) {
         $errorMessages = "Tutti i campi obbligatori devono essere compilati.";
     } else {
         // Insert data into the database
-        $insertQuery = "INSERT INTO commesse (numero, rifoff, stato, dataapertura, idcliente, deslavoro, costooffertauscita, costo_tot_comm_prev, costo_tot_forn_prev, costo_tot_pers_prev, datachiusura) 
-                        VALUES ('$numero', '$rifoff', '$stato', $dataapertura, '$idcliente', '$deslavoro', '$costooffertauscita', '$costo_tot_comm_prev', '$costo_tot_forn_prev', '$costo_tot_pers_prev', $datachiusura)";
+        $insertQuery = "INSERT INTO commesse (numero, rifoff, stato, dataapertura, idcliente, deslavoro, costooffertauscita, costo_tot_comm_prev, costo_tot_forn_prev, costo_tot_pers_prev, datachiusura, percalert) 
+                        VALUES ('$numero', '$rifoff', '$stato', $dataapertura, '$idcliente', '$deslavoro', '$costooffertauscita', '$costo_tot_comm_prev', '$costo_tot_forn_prev', '$costo_tot_pers_prev', $datachiusura,'$percalert')";
         $result = mysqli_query($mysqli, $insertQuery);
 
         if ($result) {
@@ -71,7 +72,7 @@ if (isset($_POST['update'])) {
     $costo_tot_comm_prev = !empty($_POST['costo_tot_comm_prev']) ? mysqli_real_escape_string($mysqli, $_POST['costo_tot_comm_prev']) : 0;
     $costo_tot_forn_prev = !empty($_POST['costo_tot_forn_prev']) ? mysqli_real_escape_string($mysqli, $_POST['costo_tot_forn_prev']) : 0;
     $costo_tot_pers_prev = !empty($_POST['costo_tot_pers_prev']) ? mysqli_real_escape_string($mysqli, $_POST['costo_tot_pers_prev']) : 0;
-
+    $percalert = mysqli_real_escape_string($mysqli, $_POST['percalert']);
     // Gestione dei campi di data: se vuoti, impostali su NULL
     $dataapertura = !empty($_POST['dataapertura']) ? "'" . mysqli_real_escape_string($mysqli, $_POST['dataapertura']) . "'" : "NULL";
     $datachiusura = !empty($_POST['datachiusura']) ? "'" . mysqli_real_escape_string($mysqli, $_POST['datachiusura']) . "'" : "NULL";
@@ -83,7 +84,7 @@ if (isset($_POST['update'])) {
         // Update the database
         $updateQuery = "UPDATE commesse SET numero='$numero', rifoff='$rifoff', stato='$stato', dataapertura=$dataapertura, idcliente='$idcliente', 
                         deslavoro='$deslavoro', costooffertauscita='$costooffertauscita', costo_tot_comm_prev='$costo_tot_comm_prev', 
-                        costo_tot_forn_prev='$costo_tot_forn_prev', costo_tot_pers_prev='$costo_tot_pers_prev', datachiusura=$datachiusura
+                        costo_tot_forn_prev='$costo_tot_forn_prev', costo_tot_pers_prev='$costo_tot_pers_prev', datachiusura=$datachiusura, percalert=$percalert
                         WHERE idcommessa=$idcommessa";
         $result = mysqli_query($mysqli, $updateQuery);
 
@@ -281,7 +282,8 @@ if (!$result) {
 			<th onclick="sortTable(7, this)">Costo Totale Previsto <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
 			<th onclick="sortTable(8, this)">Costo Fornitori Previsto <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
 			<th onclick="sortTable(9, this)">Costo Personale Previsto <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-			<th onclick="sortTable(10, this)">Data Chiusura <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable(10, this)">Percentuale Alert <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+			<th onclick="sortTable(11, this)">Data Chiusura <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
 			<th class="action-column">Azione</th>
 		    </tr>
 		</thead>
@@ -323,6 +325,7 @@ if (!$result) {
 								: number_format($row['costo_tot_pers_prev'], 2, ',', '.')); 
 							?>
 						</td>
+			<td><?php echo htmlspecialchars($row['percalert']); ?></td>
                         <td><?php echo !empty($row['datachiusura']) ? date('d-m-Y', strtotime($row['datachiusura'])) : ''; ?></td>
                         <td class="action-column">
 							<div class="d-flex justify-content-end">
@@ -398,6 +401,10 @@ if (!$result) {
 											<input type="number" step="0.01" name="costo_tot_pers_prev" class="form-control" id="costo_tot_pers_prev" value="<?php echo htmlspecialchars($row['costo_tot_pers_prev']); ?>">
 										</div>
                                         <div class="mb-3">
+                                            <label for="percalert" class="form-label">Percentuale Alert</label>
+                                            <input type="text" name="percalert" class="form-control" id="percalert" value="<?php echo htmlspecialchars($row['percalert']); ?>" required>
+                                        </div>
+					<div class="mb-3">
                                             <label for="datachiusura" class="form-label">Data Chiusura</label>
                                             <input type="date" name="datachiusura" class="form-control" id="datachiusura" value="<?php echo htmlspecialchars($row['datachiusura']); ?>">
                                         </div>
@@ -477,6 +484,11 @@ if (!$result) {
 							<label for="costo_tot_pers_prev" class="form-label">Costo Personale Previsto</label>
 							<input type="number" step="0.01" name="costo_tot_pers_prev" class="form-control" id="costo_tot_pers_prev">
 						</div>
+                        <div class="mb-3">
+                            <label for="percalert" class="form-label">Percentuale Alert</label>
+                            <input type="text" name="percalert" class="form-control" id="percalert" required>
+                        </div>
+                        
                         <div class="mb-3">
                             <label for="data_chiusura" class="form-label">Data Chiusura</label>
                             <input type="date" name="datachiusura" class="form-control" id="datachiusura">
