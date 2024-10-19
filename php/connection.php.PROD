@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * mysql_connect is deprecated
+ * using mysqli_connect instead
+ */
+
+$databaseHost = 'localhost';
+$databaseName = 'taceservic_DB_NEW';
+$databaseUsername = 'taceservic_DB_NEW';
+$databasePassword = 'ASDFG242378ADs';
+$ROOTPASS= '5KqCvcju4Vbuve9EkRvK';
+
+$mysqli = mysqli_connect($databaseHost, $databaseUsername, $databasePassword, $databaseName); 
+	
+?>
